@@ -1,11 +1,13 @@
 {% load static %}<!doctype html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}ShipTrack{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {# Sync script: resolves stored theme + sets <html data-bs-theme> before paint. #}
+  <script src="{% static 'js/theme.js' %}"></script>
   {% block head_extra %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
@@ -15,9 +17,41 @@
     <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'incidents:list' %}">
       <span class="brand-mark"></span> ShipTrack
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+
+    <div class="d-flex align-items-center gap-2 order-md-3 ms-md-2">
+      <div class="dropdown">
+        <button id="themeToggleBtn"
+                class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Toggle theme">
+          <span id="themeToggleIcon" aria-hidden="true">◐</span>
+          <span id="themeToggleLabel" class="d-none d-lg-inline">Auto</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+          <li>
+            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-theme-set="light" aria-pressed="false">
+              <span aria-hidden="true">☀</span> Light
+            </button>
+          </li>
+          <li>
+            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-theme-set="dark" aria-pressed="false">
+              <span aria-hidden="true">🌙</span> Dark
+            </button>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-theme-set="auto" aria-pressed="true">
+              <span aria-hidden="true">◐</span> Auto <span class="text-muted small ms-auto">system</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
     <div class="collapse navbar-collapse" id="mainNav">
       {% if user.is_authenticated %}
         <ul class="navbar-nav me-auto mb-2 mb-md-0">

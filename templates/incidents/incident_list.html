@@ -96,13 +96,13 @@
 </div>
 
 {% if page_obj.has_other_pages %}
-<nav class="d-flex justify-content-center align-items-center gap-3 mt-3" aria-label="Pagination">
+<nav class="d-flex justify-content-center align-items-center gap-3 mt-4" aria-label="Pagination">
   {% if page_obj.has_previous %}
-    <a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}">‹ prev</a>
+    <a class="pager-pill" href="?page={{ page_obj.previous_page_number }}">‹ Previous</a>
   {% endif %}
-  <span class="text-muted small">page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  <span class="text-muted small">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
   {% if page_obj.has_next %}
-    <a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.next_page_number }}">next ›</a>
+    <a class="pager-pill" href="?page={{ page_obj.next_page_number }}">Next ›</a>
   {% endif %}
 </nav>
 {% endif %}

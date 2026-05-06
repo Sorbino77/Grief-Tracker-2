@@ -1,62 +1,299 @@
-/* ShipTrack — app-specific overrides on top of Bootstrap 5.
-   CSP-safe (system fonts, no CDN). Bootstrap supplies layout,
-   typography, components; this file only adds branding,
-   status pills, and a couple of polish tweaks.
+/* ShipTrack — modern design polish on top of Bootstrap 5.
+   CSP-safe: system fonts, no CDN, no inline scripts.
+
+   What this file does:
+   - Re-themes Bootstrap to indigo / slate / emerald / amber.
+   - Softens cards (borderless, generous shadow, rounded corners).
+   - Polishes tables (sticky thead under navbar, hover row tint, tabular nums).
+   - Polishes buttons (subtle shadow, hover lift, indigo focus ring).
+   - Adds modern brand mark, status pills, KPI tiles, and pager pills.
+   - Supports auto dark mode via Bootstrap's `data-bs-theme="auto"`.
 */
 
-:root {
-  /* Override Bootstrap's primary to our indigo. */
+/* ---------- 1. theme overrides ---------- */
+:root,
+[data-bs-theme="light"] {
   --bs-primary: #4f46e5;
   --bs-primary-rgb: 79, 70, 229;
   --bs-primary-text-emphasis: #4338ca;
   --bs-primary-bg-subtle: #eef2ff;
   --bs-primary-border-subtle: #c7d2fe;
+
   --bs-link-color: #4f46e5;
-  --bs-link-hover-color: #4338ca;
   --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color: #4338ca;
   --bs-link-hover-color-rgb: 67, 56, 202;
+
+  --bs-success: #059669;
+  --bs-success-rgb: 5, 150, 105;
+  --bs-success-bg-subtle: #d1fae5;
+  --bs-success-text-emphasis: #047857;
+
+  --bs-warning: #b45309;
+  --bs-warning-rgb: 180, 83, 9;
+  --bs-warning-bg-subtle: #fef3c7;
+  --bs-warning-text-emphasis: #92400e;
+
+  --bs-danger: #dc2626;
+  --bs-danger-rgb: 220, 38, 38;
+  --bs-danger-bg-subtle: #fee2e2;
+  --bs-danger-text-emphasis: #b91c1c;
+
+  --bs-body-bg: #f8fafc;
+  --bs-body-color: #0f172a;
+  --bs-secondary-color: #64748b;
+  --bs-tertiary-bg: #f1f5f9;
+  --bs-border-color: #e2e8f0;
+
+  --bs-border-radius: 8px;
+  --bs-border-radius-sm: 6px;
+  --bs-border-radius-lg: 14px;
+  --bs-border-radius-xl: 18px;
+
+  /* App-specific tokens */
+  --shadow-card:  0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .06);
+  --shadow-hover: 0 4px 16px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+  --primary-ring: rgba(79, 70, 229, .25);
 }
 
-/* System font stack with confident sans serif. */
+[data-bs-theme="dark"] {
+  --bs-primary: #818cf8;
+  --bs-primary-text-emphasis: #a5b4fc;
+  --bs-primary-bg-subtle: rgba(99, 102, 241, .18);
+  --bs-link-color: #a5b4fc;
+  --bs-link-hover-color: #c7d2fe;
+  --bs-body-bg: #0b1220;
+  --bs-body-color: #e2e8f0;
+  --bs-secondary-color: #94a3b8;
+  --bs-tertiary-bg: #111827;
+  --bs-border-color: #1f2937;
+  --shadow-card:  0 1px 2px rgba(0, 0, 0, .35), 0 1px 3px rgba(0, 0, 0, .25);
+  --shadow-hover: 0 6px 20px rgba(0, 0, 0, .55), 0 2px 4px rgba(0, 0, 0, .35);
+  --primary-ring: rgba(129, 140, 248, .35);
+}
+
+/* ---------- 2. base ---------- */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
                Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* ---------- brand mark ---------- */
+::selection { background: var(--bs-primary-bg-subtle); color: var(--bs-body-color); }
+
+h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
+  letter-spacing: -.015em;
+  font-weight: 700;
+}
+h1, .h1 { font-size: 1.75rem; }
+h2, .h2 { font-size: 1.25rem; font-weight: 600; }
+h3, .h3 { font-size: 1.05rem; font-weight: 600; }
+
+.text-muted { color: var(--bs-secondary-color) !important; }
+
+a { transition: color 120ms ease; }
+
+/* ---------- 3. brand mark ---------- */
 .brand-mark {
   display: inline-block;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
   background:
-    radial-gradient(circle at 30% 30%, #a5b4fc 0%, #4f46e5 70%, #4338ca 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25);
+    radial-gradient(circle at 30% 30%, #a5b4fc 0%, #6366f1 55%, #4338ca 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .25),
+    0 1px 2px rgba(67, 56, 202, .35);
 }
-.navbar-brand { letter-spacing: -.01em; }
+.navbar-brand {
+  letter-spacing: -.015em;
+  font-weight: 700;
+}
 
-/* Slight elevated feel for the navbar */
+/* ---------- 4. navbar ---------- */
 .navbar.sticky-top {
-  backdrop-filter: saturate(180%) blur(10px);
-  -webkit-backdrop-filter: saturate(180%) blur(10px);
-  background-color: rgba(255, 255, 255, .85) !important;
+  z-index: 1050;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  background-color: rgba(255, 255, 255, .82) !important;
+  border-bottom: 1px solid var(--bs-border-color) !important;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, .03);
 }
 [data-bs-theme="dark"] .navbar.sticky-top {
-  background-color: rgba(33, 37, 41, .85) !important;
+  background-color: rgba(11, 18, 32, .82) !important;
 }
 
-/* ---------- semantic status pills ---------- */
-.status-pill {
-  font-size: .78rem;
+.navbar .nav-link {
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-weight: 500;
+  color: var(--bs-secondary-color);
+  transition: background 120ms ease, color 120ms ease;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: var(--bs-primary-text-emphasis);
+  background: var(--bs-primary-bg-subtle);
+}
+.navbar .nav-link.active {
+  color: var(--bs-primary-text-emphasis);
+  background: var(--bs-primary-bg-subtle);
+}
+
+/* ---------- 5. cards ---------- */
+.card {
+  border: none !important;
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: var(--shadow-card);
+  background: var(--bs-body-bg);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+[data-bs-theme="light"] .card { background: #ffffff; }
+[data-bs-theme="dark"]  .card { background: #111827; }
+
+.card.card-hoverable:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* ---------- 6. tables ---------- */
+.table {
+  --bs-table-bg: transparent;
+  margin-bottom: 0;
+  font-variant-numeric: tabular-nums;
+}
+.table > :not(caption) > * > * {
+  padding: .75rem 1rem;
+  border-bottom-color: var(--bs-border-color);
+}
+.table thead th {
+  font-size: .75rem;
   font-weight: 600;
-  letter-spacing: .01em;
-  padding: .35em .7em;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+  background: var(--bs-tertiary-bg);
+  border-bottom: 1px solid var(--bs-border-color);
+}
+.table-hover > tbody > tr:hover > * {
+  background: var(--bs-primary-bg-subtle);
+  color: inherit;
+  --bs-table-accent-bg: var(--bs-primary-bg-subtle);
+}
+.table tbody td a { font-weight: 500; }
+
+/* Sticky thead under the navbar */
+.table-responsive {
+  border-radius: var(--bs-border-radius-lg);
+}
+.card .table-responsive { border-radius: inherit; }
+.card > .table-responsive > .table thead th {
+  position: sticky;
+  top: 64px;
+  z-index: 2;
+}
+
+/* ---------- 7. buttons ---------- */
+.btn {
+  font-weight: 500;
+  border-radius: var(--bs-border-radius-sm);
+  padding: .45rem 1rem;
+  transition: background 120ms ease, border-color 120ms ease,
+              color 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-sm { padding: .3rem .7rem; }
+
+.btn-primary {
+  background: var(--bs-primary);
+  border-color: var(--bs-primary);
+  box-shadow: 0 1px 2px rgba(79, 70, 229, .25);
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--bs-link-hover-color);
+  border-color: var(--bs-link-hover-color);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, .3);
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary-border-subtle);
+}
+.btn-outline-primary:hover {
+  background: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-outline-secondary {
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
+  background: transparent;
+}
+.btn-outline-secondary:hover {
+  background: var(--bs-tertiary-bg);
+  border-color: var(--bs-secondary-color);
+  color: var(--bs-body-color);
+}
+
+.btn-outline-danger {
+  color: var(--bs-danger);
+  border-color: rgba(220, 38, 38, .35);
+}
+
+/* Universal indigo focus ring */
+.btn:focus-visible,
+.btn-check:focus-visible + .btn,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus,
+.page-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 .2rem var(--primary-ring);
+  border-color: var(--bs-primary);
+}
+
+/* ---------- 8. forms ---------- */
+.form-control,
+.form-select {
+  border-radius: var(--bs-border-radius-sm);
+  border-color: var(--bs-border-color);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.form-control:hover:not(:focus),
+.form-select:hover:not(:focus) {
+  border-color: #cbd5e1;
+}
+[data-bs-theme="dark"] .form-control:hover:not(:focus),
+[data-bs-theme="dark"] .form-select:hover:not(:focus) {
+  border-color: #475569;
+}
+.form-label {
+  font-weight: 500;
+  color: var(--bs-body-color);
+  margin-bottom: .35rem;
+}
+.form-text { color: var(--bs-secondary-color); }
+textarea.form-control { min-height: 90px; }
+
+/* ---------- 9. badges + status pills ---------- */
+.badge { font-weight: 600; letter-spacing: .005em; padding: .35em .65em; }
+
+.status-pill {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .015em;
+  text-transform: none;
+  padding: .35em .75em;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  border: 1px solid transparent;
 }
 .status-pill::before {
   content: "";
@@ -64,49 +301,99 @@ body {
   height: 6px;
   border-radius: 50%;
   background: currentColor;
+  flex: 0 0 auto;
 }
-.status-ongoing  { background: #fef3c7; color: #b45309; border: 1px solid rgba(180, 83, 9, .15); }
-.status-resolved { background: #d1fae5; color: #059669; border: 1px solid rgba(5, 150, 105, .2); }
-
-[data-bs-theme="dark"] .status-ongoing  { background: rgba(180, 83, 9, .15); color: #fbbf24; }
-[data-bs-theme="dark"] .status-resolved { background: rgba(5, 150, 105, .15); color: #34d399; }
-
-/* ---------- table polish ---------- */
-.table > :not(caption) > * > * {
-  padding: .65rem .9rem;
+.status-ongoing  {
+  background: var(--bs-warning-bg-subtle);
+  color: var(--bs-warning);
+  border-color: rgba(180, 83, 9, .15);
 }
-.table thead th {
-  font-size: .78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  color: var(--bs-secondary-color);
-  white-space: nowrap;
+.status-resolved {
+  background: var(--bs-success-bg-subtle);
+  color: var(--bs-success);
+  border-color: rgba(5, 150, 105, .2);
 }
-.table tbody {
-  font-variant-numeric: tabular-nums;
+[data-bs-theme="dark"] .status-ongoing  {
+  background: rgba(180, 83, 9, .18);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, .2);
 }
-
-/* ---------- form polish: indigo focus ring ---------- */
-.form-control:focus,
-.form-select:focus,
-.form-check-input:focus,
-.btn:focus-visible,
-.btn-check:focus-visible + .btn {
-  border-color: var(--bs-primary);
-  box-shadow: 0 0 0 .2rem rgba(79, 70, 229, .25);
+[data-bs-theme="dark"] .status-resolved {
+  background: rgba(5, 150, 105, .18);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, .2);
 }
 
-/* ---------- alerts: a touch of left border ---------- */
+/* ---------- 10. alerts ---------- */
 .alert {
-  border-left-width: 4px;
+  border: none;
+  border-left: 4px solid;
+  border-radius: var(--bs-border-radius);
+  box-shadow: var(--shadow-card);
+  animation: slide-in .25s ease;
+}
+.alert-success { border-left-color: var(--bs-success); }
+.alert-warning { border-left-color: var(--bs-warning); }
+.alert-danger  { border-left-color: var(--bs-danger);  }
+.alert-info,
+.alert-primary { border-left-color: var(--bs-primary); }
+.alert-secondary { border-left-color: var(--bs-secondary-color); }
+
+/* ---------- 11. KPI tiles (used on the import report) ---------- */
+.kpi-card .card-body {
+  padding: 1.1rem 1.25rem;
+}
+.kpi-card .fs-4 {
+  font-size: 1.75rem !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.015em;
+  line-height: 1;
 }
 
-/* ---------- footer ---------- */
-.footer { letter-spacing: .01em; }
+/* ---------- 12. pager ---------- */
+.pager-pill {
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
+  color: var(--bs-secondary-color);
+  border-radius: 999px;
+  padding: .35rem .9rem;
+  font-size: .85rem;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.pager-pill:hover {
+  background: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary-text-emphasis);
+  border-color: var(--bs-primary-border-subtle);
+  text-decoration: none;
+}
 
-/* ---------- print ---------- */
+/* ---------- 13. animations ---------- */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card,
+main > * {
+  animation: fade-up .25s ease both;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- 14. footer ---------- */
+.footer {
+  letter-spacing: .01em;
+  background: var(--bs-body-bg) !important;
+  border-top-color: var(--bs-border-color) !important;
+}
+
+/* ---------- 15. print ---------- */
 @media print {
   .navbar, .alert, .footer, form[role="search"], .btn { display: none !important; }
   .card { border: none !important; box-shadow: none !important; }
+  .table thead th { position: static !important; }
 }
