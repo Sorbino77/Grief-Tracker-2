@@ -4,6 +4,7 @@
 {% block content %}
 <h1 class="h3 mb-3">Analytics</h1>
 
+{# Single combined form so the pivot selectors and the filter persist together. #}
 <form method="get" class="card card-body shadow-sm border-0 mb-3" role="search">
   <div class="row g-2 align-items-end">
     <div class="col-6 col-md-3">
@@ -26,6 +27,25 @@
       <label class="form-label small text-uppercase text-muted mb-1">Date to</label>
       {{ filter.form.issue_date_to }}
     </div>
+
+    <div class="col-12"><hr class="my-2"></div>
+
+    <div class="col-6 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Pivot rows</label>
+      <select name="row" class="form-select">
+        {% for k, label in row_choices %}
+          <option value="{{ k }}" {% if k == row_key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Pivot columns</label>
+      <select name="col" class="form-select">
+        {% for k, label in col_choices %}
+          <option value="{{ k }}" {% if k == col_key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div class="col-12 col-md-auto d-flex gap-2 align-self-end">
       <button type="submit" class="btn btn-primary">Apply</button>
       <a href="{% url 'incidents:analytics' %}" class="btn btn-outline-secondary">Reset</a>
@@ -35,6 +55,75 @@
 
 <p class="text-muted small">{{ total }} incident{{ total|pluralize }} match the filter.</p>
 
+{# ---------- main pivot table ---------- #}
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h2 class="h6 m-0 text-muted">
+        Pivot: <strong class="text-body">{{ pivot.row_label }}</strong>
+        {% if pivot.col_label %} × <strong class="text-body">{{ pivot.col_label }}</strong>{% endif %}
+      </h2>
+      <span class="text-muted small">Grand total: <strong class="text-body">{{ pivot.grand_total }}</strong></span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0 pivot-table">
+        <thead>
+          <tr>
+            <th>{{ pivot.row_label }}</th>
+            {% for cv in pivot.col_values %}
+              <th class="text-end">{{ cv }}</th>
+            {% endfor %}
+            {% if pivot.has_columns %}
+              <th class="text-end">Total</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in pivot.rows %}
+            <tr>
+              <td class="fw-medium">{{ row.label }}</td>
+              {% for cell in row.cells %}
+                {% if cell %}
+                  <td class="text-end pivot-cell{% if cell == pivot.max_cell %} is-max{% endif %}"
+                      style="--cell-ratio: {% widthratio cell pivot.max_cell 100 %}">{{ cell }}</td>
+                {% else %}
+                  <td class="text-end pivot-cell"><span class="text-muted">·</span></td>
+                {% endif %}
+              {% endfor %}
+              <td class="text-end pivot-total">{{ row.total }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="{{ pivot.col_values|length|add:2 }}" class="text-center text-muted py-4">No data for the current filter.</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if pivot.has_columns and pivot.rows %}
+          <tfoot>
+            <tr>
+              <td class="pivot-total">Total</td>
+              {% for ct in pivot.col_totals %}
+                <td class="text-end pivot-total">{{ ct }}</td>
+              {% endfor %}
+              <td class="text-end pivot-total">{{ pivot.grand_total }}</td>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+    </div>
+
+    {% if pivot.max_cell %}
+      <div class="pivot-legend" aria-hidden="true">
+        <span>0</span>
+        <span class="pivot-legend-bar"></span>
+        <span>{{ pivot.max_cell }}</span>
+        <span class="ms-2 small">Cell shade ∝ count.</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{# ---------- at-a-glance breakdowns ---------- #}
+<h2 class="h5 mb-3">At-a-glance</h2>
 <div class="row g-3">
   <div class="col-12 col-md-6">
     <section class="card shadow-sm border-0 h-100">
@@ -93,9 +182,7 @@
           <tbody>
           {% for row in by_status %}
             <tr>
-              <td>
-                <span class="badge status-pill status-{{ row.status|lower }}">{{ row.status }}</span>
-              </td>
+              <td><span class="badge status-pill status-{{ row.status|lower }}">{{ row.status }}</span></td>
               <td class="text-end fw-medium">{{ row.n }}</td>
             </tr>
           {% endfor %}

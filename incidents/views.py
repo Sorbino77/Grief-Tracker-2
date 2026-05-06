@@ -21,6 +21,7 @@ from .filters import IncidentFilter
 from .forms import ImportUploadForm, IncidentForm
 from .importers import ALLOWED_EXTENSIONS, IncidentImporter
 from .models import Incident, Status
+from .pivot import DIMENSIONS, NONE_KEY, build_pivot, dimension_choices
 
 logger = logging.getLogger(__name__)
 
@@ -145,11 +146,22 @@ def incident_import(request):
 
 @login_required
 def analytics(request):
-    """Pivot-table-style summary across the incidents."""
+    """Pivot-table-style summary across the incidents (mirrors the original
+    Excel "Analysis" sheet but interactively)."""
     qs = Incident.objects.all()
     f = IncidentFilter(request.GET, queryset=qs)
     base = f.qs
 
+    # ----- interactive pivot -----
+    row_key = request.GET.get("row", "carrier")
+    col_key = request.GET.get("col", "year")
+    if row_key not in DIMENSIONS:
+        row_key = "carrier"
+    if col_key != NONE_KEY and col_key not in DIMENSIONS:
+        col_key = "year"
+    pivot = build_pivot(base, row_key, col_key)
+
+    # ----- simple at-a-glance breakdowns -----
     by_carrier = base.values("carrier__name").annotate(n=Count("id")).order_by("-n")[:20]
     by_issue = base.values("issue_type__name").annotate(n=Count("id")).order_by("-n")[:20]
     by_party = base.values("causing_party").annotate(n=Count("id")).order_by("-n")
@@ -161,6 +173,11 @@ def analytics(request):
         "incidents/analytics.html",
         {
             "filter": f,
+            "pivot": pivot,
+            "row_choices": dimension_choices(),
+            "col_choices": [(NONE_KEY, "(none)"), *dimension_choices()],
+            "row_key": row_key,
+            "col_key": col_key,
             "by_carrier": list(by_carrier),
             "by_issue": list(by_issue),
             "by_party": list(by_party),

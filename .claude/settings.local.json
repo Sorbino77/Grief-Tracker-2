@@ -46,7 +46,10 @@
       "Bash(cd /tmp)",
       "Bash(rm -f cookies.txt)",
       "Bash(curl -sS -c cookies.txt -b cookies.txt http://127.0.0.1:8000/accounts/login/ -o /dev/null)",
-      "Bash(grep -oE '\\(<link[^>]*>|<nav[^>]*>|class=\"[^\"]{1,80}\"\\)')"
+      "Bash(grep -oE '\\(<link[^>]*>|<nav[^>]*>|class=\"[^\"]{1,80}\"\\)')",
+      "Bash(grep -F -e -- \"--cell-ratio\")",
+      "Bash(grep -F -e -- \"pivot-cell\")",
+      "Bash(rm -f cookies.txt body.html)"
     ]
   }
 }
