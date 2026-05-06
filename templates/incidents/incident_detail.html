@@ -2,39 +2,76 @@
 {% block title %}{{ obj.primary_ref }} · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>{{ obj.primary_ref }}
-  <span class="pill pill-{{ obj.status|lower }}">{{ obj.get_status_display }}</span></h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="h3 m-0">
+      {{ obj.primary_ref }}
+      <span class="badge status-pill status-{{ obj.status|lower }} ms-2">{{ obj.get_status_display }}</span>
+    </h1>
+    {% if obj.issue_type %}
+      <p class="text-muted small mb-0">{{ obj.issue_type.name }}</p>
+    {% endif %}
+  </div>
+  <a href="{% url 'incidents:list' %}" class="btn btn-sm btn-outline-secondary">← Back to incidents</a>
+</div>
 
-<dl class="kv">
-  <dt>Ship ID</dt><dd>{{ obj.ship_id|default:"—" }}</dd>
-  <dt>Transport order ref</dt><dd>{{ obj.transport_order_ref|default:"—" }}</dd>
-  <dt>Supplier</dt><dd>{{ obj.supplier_name|default:"—" }}</dd>
-  <dt>Country / Location</dt><dd>{{ obj.country|default:"—" }} / {{ obj.location.code|default:"—" }}</dd>
-  <dt>Carrier</dt><dd>{{ obj.carrier.name|default:"—" }}</dd>
-  <dt>Issue type</dt><dd>{{ obj.issue_type.name|default:"—" }}</dd>
-  <dt>Issue date</dt><dd>{{ obj.issue_date|date:"Y-m-d" }}</dd>
-  <dt>Image</dt><dd>{{ obj.get_image_available_display }}</dd>
-  <dt>Causing party</dt><dd>{{ obj.get_causing_party_display }}</dd>
-  <dt>Resolve date</dt><dd>{{ obj.resolve_date|date:"Y-m-d"|default:"—" }}</dd>
-  <dt>Note</dt><dd>{{ obj.note|linebreaksbr|default:"—" }}</dd>
-  <dt>Created</dt><dd>{{ obj.created_at|date:"Y-m-d H:i" }} by {{ obj.created_by|default:"system" }}</dd>
-  <dt>Updated</dt><dd>{{ obj.updated_at|date:"Y-m-d H:i" }} by {{ obj.updated_by|default:"system" }}</dd>
-</dl>
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3 text-muted">Ship ID</dt>
+      <dd class="col-sm-9">{{ obj.ship_id|default:"—" }}</dd>
 
-<div class="actions">
-  <a href="{% url 'incidents:list' %}" class="btn-link">← back</a>
+      <dt class="col-sm-3 text-muted">Transport order ref</dt>
+      <dd class="col-sm-9">{{ obj.transport_order_ref|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Supplier</dt>
+      <dd class="col-sm-9">{{ obj.supplier_name|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Country / Location</dt>
+      <dd class="col-sm-9">{{ obj.country|default:"—" }} / {{ obj.location.code|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Carrier</dt>
+      <dd class="col-sm-9">{{ obj.carrier.name|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Issue date</dt>
+      <dd class="col-sm-9">{{ obj.issue_date|date:"Y-m-d" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Image</dt>
+      <dd class="col-sm-9">{{ obj.get_image_available_display }}</dd>
+
+      <dt class="col-sm-3 text-muted">Causing party</dt>
+      <dd class="col-sm-9">{{ obj.get_causing_party_display }}</dd>
+
+      <dt class="col-sm-3 text-muted">Resolve date</dt>
+      <dd class="col-sm-9">{{ obj.resolve_date|date:"Y-m-d"|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Note</dt>
+      <dd class="col-sm-9">{{ obj.note|linebreaksbr|default:"—" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Created</dt>
+      <dd class="col-sm-9">{{ obj.created_at|date:"Y-m-d H:i" }} by {{ obj.created_by|default:"system" }}</dd>
+
+      <dt class="col-sm-3 text-muted">Updated</dt>
+      <dd class="col-sm-9">{{ obj.updated_at|date:"Y-m-d H:i" }} by {{ obj.updated_by|default:"system" }}</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mt-3">
   {% if is_editor %}
-    <a href="{% url 'incidents:edit' obj.pk %}" class="btn">Edit</a>
+    <a href="{% url 'incidents:edit' obj.pk %}" class="btn btn-outline-primary">Edit</a>
     {% if obj.status != "RESOLVED" %}
-      <form method="post" action="{% url 'incidents:resolve' obj.pk %}" class="inline-form">
-        {% csrf_token %}<button type="submit" class="btn btn-primary">Mark resolved</button>
+      <form method="post" action="{% url 'incidents:resolve' obj.pk %}" class="d-inline m-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Mark resolved</button>
       </form>
     {% endif %}
   {% endif %}
   {% if is_admin %}
-    <form method="post" action="{% url 'incidents:delete' obj.pk %}" class="inline-form"
+    <form method="post" action="{% url 'incidents:delete' obj.pk %}" class="d-inline m-0 ms-auto"
           onsubmit="return confirm('Delete this incident? This cannot be undone.');">
-      {% csrf_token %}<button type="submit" class="btn btn-danger">Delete</button>
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger">Delete</button>
     </form>
   {% endif %}
 </div>

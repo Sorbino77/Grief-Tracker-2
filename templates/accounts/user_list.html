@@ -2,41 +2,73 @@
 {% block title %}Users · ShipTrack{% endblock %}
 
 {% block content %}
-<div class="page-head">
-  <h1>Users</h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 m-0">Users</h1>
   <a href="{% url 'accounts:user_create' %}" class="btn btn-primary">+ New user</a>
 </div>
-<p class="muted">Admins can adjust roles below. You can't change your own role — ask another admin if you need to step down.</p>
 
-<table class="data">
-  <thead>
-    <tr><th>Username</th><th>Email</th><th>Role</th><th>Last login</th><th>Active</th><th></th></tr>
-  </thead>
-  <tbody>
-  {% for u in users %}
-    <tr>
-      <td>{{ u.username }}{% if u.pk == request.user.pk %} <span class="muted">(you)</span>{% endif %}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.get_role_display }}</td>
-      <td>{{ u.last_login|date:"Y-m-d H:i"|default:"—" }}</td>
-      <td>{% if u.is_active %}yes{% else %}no{% endif %}</td>
-      <td>
-        {% if u.pk == request.user.pk %}
-          <span class="muted">— locked —</span>
-        {% else %}
-          <form method="post" action="{% url 'accounts:change_role' u.pk %}" class="inline-form">
-            {% csrf_token %}
-            <select name="role" aria-label="Change role for {{ u.username }}">
-              {% for value, label in Role.choices %}
-                <option value="{{ value }}" {% if u.role == value %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
-            <button type="submit" class="btn">Save</button>
-          </form>
-        {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+<p class="text-muted small">
+  Admins can adjust roles below. You can't change your own role —
+  ask another admin if you need to step down.
+</p>
+
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Last login</th>
+          <th>Active</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td>
+            <span class="fw-medium">{{ u.username }}</span>
+            {% if u.pk == request.user.pk %}<span class="badge text-bg-light ms-1">you</span>{% endif %}
+          </td>
+          <td>{{ u.email }}</td>
+          <td>
+            {% if u.role == "admin" %}
+              <span class="badge text-bg-primary">Admin</span>
+            {% elif u.role == "editor" %}
+              <span class="badge text-bg-info">Editor</span>
+            {% else %}
+              <span class="badge text-bg-secondary">Viewer</span>
+            {% endif %}
+          </td>
+          <td>{{ u.last_login|date:"Y-m-d H:i"|default:"—" }}</td>
+          <td>
+            {% if u.is_active %}
+              <span class="badge text-bg-success">yes</span>
+            {% else %}
+              <span class="badge text-bg-secondary">no</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {% if u.pk == request.user.pk %}
+              <span class="text-muted small">— locked —</span>
+            {% else %}
+              <form method="post" action="{% url 'accounts:change_role' u.pk %}" class="d-inline-flex align-items-center gap-2 m-0">
+                {% csrf_token %}
+                <select name="role" class="form-select form-select-sm w-auto" aria-label="Change role for {{ u.username }}">
+                  {% for value, label in Role.choices %}
+                    <option value="{{ value }}" {% if u.role == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

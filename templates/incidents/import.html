@@ -2,48 +2,94 @@
 {% block title %}Import · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>Import incidents</h1>
+<h1 class="h3 mb-3">Import incidents</h1>
 
-<p class="muted">
-  Upload an .xlsx, .xlsm, or .csv file. Columns are auto-detected by header
-  name (e.g. <code>Primary Ref</code>, <code>Ship ID</code>, <code>Issue type</code>,
-  <code>Date</code>). Legacy headers (<code>K&amp;N REF</code>, <code>KN REF</code>,
-  <code>Kuehne ref</code>) are also recognised. Existing rows with the same
-  primary reference + issue type are updated, not duplicated.
-</p>
-
-<form method="post" enctype="multipart/form-data" class="stacked-form">
-  {% csrf_token %}
-  {% for field in form %}
-    <p>
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-      {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
-      {% for err in field.errors %}<small class="error">{{ err }}</small>{% endfor %}
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <p class="text-muted mb-3">
+      Upload an <code>.xlsx</code>, <code>.xlsm</code>, or <code>.csv</code> file. Columns are
+      auto-detected by header name (e.g. <code>Primary Ref</code>, <code>Ship ID</code>,
+      <code>Issue type</code>, <code>Date</code>). Legacy headers (<code>K&amp;N REF</code>,
+      <code>KN REF</code>, <code>Kuehne ref</code>) are also recognised. Existing rows with the
+      same primary reference + issue type are updated, not duplicated.
     </p>
-  {% endfor %}
-  <button type="submit" class="btn btn-primary">Import</button>
-</form>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="col-12 col-md-6">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+            {% for err in field.errors %}<div class="invalid-feedback d-block">{{ err }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary mt-4">Import</button>
+    </form>
+  </div>
+</div>
 
 {% if report %}
-  <h2>Import report</h2>
-  <ul class="kpis">
-    <li><strong>{{ report.created }}</strong> created</li>
-    <li><strong>{{ report.updated }}</strong> updated</li>
-    <li><strong>{{ report.skipped }}</strong> skipped</li>
-    <li><strong>{{ report.errors|length }}</strong> errors</li>
-    {% if report.dry_run %}<li class="pill pill-ongoing">dry-run</li>{% endif %}
-  </ul>
+  <h2 class="h5 mt-4">Import report</h2>
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-md-3">
+      <div class="card shadow-sm border-0 text-center">
+        <div class="card-body py-3">
+          <div class="fs-4 fw-bold text-success">{{ report.created }}</div>
+          <div class="small text-muted">Created</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card shadow-sm border-0 text-center">
+        <div class="card-body py-3">
+          <div class="fs-4 fw-bold text-primary">{{ report.updated }}</div>
+          <div class="small text-muted">Updated</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card shadow-sm border-0 text-center">
+        <div class="card-body py-3">
+          <div class="fs-4 fw-bold text-secondary">{{ report.skipped }}</div>
+          <div class="small text-muted">Skipped</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card shadow-sm border-0 text-center">
+        <div class="card-body py-3">
+          <div class="fs-4 fw-bold {% if report.errors %}text-danger{% else %}text-muted{% endif %}">
+            {{ report.errors|length }}
+          </div>
+          <div class="small text-muted">Errors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if report.dry_run %}
+    <div class="alert alert-info">Dry run — nothing was written to the database.</div>
+  {% endif %}
+
   {% if report.errors %}
-    <h3>First 50 errors</h3>
-    <table class="data">
-      <thead><tr><th>Row</th><th>Message</th></tr></thead>
-      <tbody>
-      {% for row, msg in report.errors|slice:":50" %}
-        <tr><td>{{ row }}</td><td>{{ msg }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <h3 class="h6">First 50 errors</h3>
+    <div class="card shadow-sm border-0">
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Row</th><th>Message</th></tr>
+          </thead>
+          <tbody>
+            {% for row, msg in report.errors|slice:":50" %}
+              <tr><td class="text-nowrap">{{ row }}</td><td>{{ msg }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   {% endif %}
 {% endif %}
 {% endblock %}

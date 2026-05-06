@@ -1,53 +1,74 @@
 {% load static %}<!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}ShipTrack{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   {% block head_extra %}{% endblock %}
 </head>
-<body>
-<header class="topbar">
-  <div class="brand">
-    <a href="{% url 'incidents:list' %}">ShipTrack</a>
+<body class="d-flex flex-column min-vh-100 bg-body-tertiary">
+
+<nav class="navbar navbar-expand-md bg-body sticky-top border-bottom shadow-sm">
+  <div class="container-xl px-3 px-md-4">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'incidents:list' %}">
+      <span class="brand-mark"></span> ShipTrack
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      {% if user.is_authenticated %}
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link" href="{% url 'incidents:list' %}">Incidents</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'incidents:analytics' %}">Analytics</a></li>
+          {% if is_editor %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'incidents:create' %}">New</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'incidents:import' %}">Import</a></li>
+          {% endif %}
+          {% if is_admin %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'accounts:user_list' %}">Users</a></li>
+          {% endif %}
+        </ul>
+        <div class="d-flex align-items-center gap-2">
+          <a class="nav-link" href="{% url 'accounts:profile' %}">{{ user.username }}</a>
+          <form method="post" action="{% url 'account_logout' %}" class="d-inline m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-secondary">Sign out</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="ms-auto">
+          <a class="btn btn-sm btn-primary" href="{% url 'account_login' %}">Sign in</a>
+        </div>
+      {% endif %}
+    </div>
   </div>
-  <nav>
-    {% if user.is_authenticated %}
-      <a href="{% url 'incidents:list' %}">Incidents</a>
-      <a href="{% url 'incidents:analytics' %}">Analytics</a>
-      {% if is_editor %}
-        <a href="{% url 'incidents:create' %}">New</a>
-        <a href="{% url 'incidents:import' %}">Import</a>
-      {% endif %}
-      {% if is_admin %}
-        <a href="{% url 'accounts:user_list' %}">Users</a>
-      {% endif %}
-      <a href="{% url 'accounts:profile' %}">{{ user.username }}</a>
-      <form method="post" action="{% url 'account_logout' %}" class="inline-form">
-        {% csrf_token %}
-        <button type="submit" class="link-button">Sign out</button>
-      </form>
-    {% else %}
-      <a href="{% url 'account_login' %}">Sign in</a>
-    {% endif %}
-  </nav>
-</header>
+</nav>
 
 {% if messages %}
-  <ul class="messages">
+  <div class="container-xl px-3 px-md-4 mt-3" id="messages">
     {% for message in messages %}
-      <li class="msg msg-{{ message.tags }}">{{ message }}</li>
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 {% endif %}
 
-<main class="container">
+<main class="container-xl px-3 px-md-4 my-4 flex-grow-1">
   {% block content %}{% endblock %}
 </main>
 
-<footer class="footer">
-  <small>ShipTrack &middot; hardened with Django + OWASP best practices</small>
+<footer class="footer text-center text-secondary small py-4 border-top mt-4 bg-body">
+  <div class="container-xl px-3">
+    ShipTrack · hardened with Django + OWASP best practices
+  </div>
 </footer>
+
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% block body_extra %}{% endblock %}
 </body>
 </html>

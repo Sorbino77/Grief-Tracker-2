@@ -2,61 +2,108 @@
 {% block title %}Incidents · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>Incidents</h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 m-0">Incidents</h1>
+  {% if is_editor %}
+    <a href="{% url 'incidents:create' %}" class="btn btn-primary">+ New incident</a>
+  {% endif %}
+</div>
 
-<form method="get" class="filter-bar" role="search">
-  {{ filter.form.q.label_tag }} {{ filter.form.q }}
-  {{ filter.form.status.label_tag }} {{ filter.form.status }}
-  {{ filter.form.causing_party.label_tag }} {{ filter.form.causing_party }}
-  {{ filter.form.carrier.label_tag }} {{ filter.form.carrier }}
-  {{ filter.form.issue_type.label_tag }} {{ filter.form.issue_type }}
-  {{ filter.form.issue_date_from.label_tag }} {{ filter.form.issue_date_from }}
-  {{ filter.form.issue_date_to.label_tag }} {{ filter.form.issue_date_to }}
-  <button type="submit">Apply</button>
-  <a href="{% url 'incidents:list' %}" class="btn-link">Reset</a>
+<form method="get" class="card card-body shadow-sm border-0 mb-3" role="search">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Search</label>
+      {{ filter.form.q }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Status</label>
+      {{ filter.form.status }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Causing party</label>
+      {{ filter.form.causing_party }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Carrier</label>
+      {{ filter.form.carrier }}
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Issue type</label>
+      {{ filter.form.issue_type }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Date from</label>
+      {{ filter.form.issue_date_from }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Date to</label>
+      {{ filter.form.issue_date_to }}
+    </div>
+    <div class="col-12 col-md-auto d-flex gap-2 align-self-end">
+      <button type="submit" class="btn btn-primary">Apply</button>
+      <a href="{% url 'incidents:list' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </div>
 </form>
 
-<p class="muted">{{ page_obj.paginator.count }} incident{{ page_obj.paginator.count|pluralize }}</p>
+<p class="text-muted small">
+  {{ page_obj.paginator.count }} incident{{ page_obj.paginator.count|pluralize }}
+</p>
 
-<table class="data">
-  <thead>
-    <tr>
-      <th>Primary ref</th>
-      <th>Ship ID</th>
-      <th>Supplier</th>
-      <th>Carrier</th>
-      <th>Issue type</th>
-      <th>Date</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for r in page_obj %}
-    <tr>
-      <td><a href="{% url 'incidents:detail' r.pk %}">{{ r.primary_ref }}</a></td>
-      <td>{{ r.ship_id }}</td>
-      <td>{{ r.supplier_name }}</td>
-      <td>{{ r.carrier.name|default:"—" }}</td>
-      <td>{{ r.issue_type.name|default:"—" }}</td>
-      <td>{{ r.issue_date|date:"Y-m-d" }}</td>
-      <td><span class="pill pill-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
-      <td>
-        <a href="{% url 'incidents:detail' r.pk %}">view</a>
-        {% if is_editor %} · <a href="{% url 'incidents:edit' r.pk %}">edit</a>{% endif %}
-      </td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="8" class="muted">No incidents match your filters.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Primary ref</th>
+          <th scope="col">Ship ID</th>
+          <th scope="col">Supplier</th>
+          <th scope="col">Carrier</th>
+          <th scope="col">Issue type</th>
+          <th scope="col">Date</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in page_obj %}
+        <tr>
+          <td><a class="fw-medium" href="{% url 'incidents:detail' r.pk %}">{{ r.primary_ref }}</a></td>
+          <td>{{ r.ship_id }}</td>
+          <td>{{ r.supplier_name }}</td>
+          <td>{{ r.carrier.name|default:"—" }}</td>
+          <td>{{ r.issue_type.name|default:"—" }}</td>
+          <td class="text-nowrap">{{ r.issue_date|date:"Y-m-d" }}</td>
+          <td>
+            <span class="badge status-pill status-{{ r.status|lower }}">
+              {{ r.get_status_display }}
+            </span>
+          </td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'incidents:detail' r.pk %}" class="link-secondary">View</a>
+            {% if is_editor %}
+              <span class="text-muted">·</span>
+              <a href="{% url 'incidents:edit' r.pk %}" class="link-secondary">Edit</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No incidents match your filters.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
 {% if page_obj.has_other_pages %}
-<nav class="pager">
-  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">‹ prev</a>{% endif %}
-  <span>page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">next ›</a>{% endif %}
+<nav class="d-flex justify-content-center align-items-center gap-3 mt-3" aria-label="Pagination">
+  {% if page_obj.has_previous %}
+    <a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}">‹ prev</a>
+  {% endif %}
+  <span class="text-muted small">page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.next_page_number }}">next ›</a>
+  {% endif %}
 </nav>
 {% endif %}
 {% endblock %}

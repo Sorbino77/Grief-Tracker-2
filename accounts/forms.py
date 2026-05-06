@@ -7,10 +7,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
+from shiptrack.formhelpers import BootstrapFormMixin
+
 from .models import Role, User
 
 
-class UserCreateForm(UserCreationForm):
+class UserCreateForm(BootstrapFormMixin, UserCreationForm):
     """Admin-side 'invite a teammate' form.
 
     Uses Django's ``UserCreationForm`` as the base so we get the standard

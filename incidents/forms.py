@@ -8,13 +8,15 @@ from datetime import date
 from django import forms
 from django.core.exceptions import ValidationError
 
+from shiptrack.formhelpers import BootstrapFormMixin
+
 from .models import Incident
 
 _SAFE_REF = re.compile(r"^[A-Za-z0-9 _\-./]{1,64}$")
 _ISO2 = re.compile(r"^[A-Z]{2}$")
 
 
-class IncidentForm(forms.ModelForm):
+class IncidentForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Incident
         fields = [
@@ -80,7 +82,7 @@ class IncidentForm(forms.ModelForm):
         return cleaned
 
 
-class ImportUploadForm(forms.Form):
+class ImportUploadForm(BootstrapFormMixin, forms.Form):
     file = forms.FileField(help_text="Upload .xlsx / .xlsm / .csv. Max 25 MB.")
     sheet_name = forms.CharField(
         required=False,

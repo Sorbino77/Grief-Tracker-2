@@ -2,15 +2,25 @@
 {% block title %}Profile · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>Your profile</h1>
-<dl class="kv">
-  <dt>Username</dt><dd>{{ user_obj.username }}</dd>
-  <dt>Email</dt><dd>{{ user_obj.email }}</dd>
-  <dt>Role</dt><dd>{{ user_obj.get_role_display }}</dd>
-  <dt>Last login</dt><dd>{{ user_obj.last_login|date:"Y-m-d H:i" }}</dd>
-</dl>
-<p>
-  <a href="{% url 'account_change_password' %}" class="btn">Change password</a>
-  <a href="{% url 'account_email' %}" class="btn">Manage emails</a>
-</p>
+<h1 class="h3 mb-3">Your profile</h1>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3 text-muted">Username</dt>
+      <dd class="col-sm-9">{{ user_obj.username }}</dd>
+      <dt class="col-sm-3 text-muted">Email</dt>
+      <dd class="col-sm-9">{{ user_obj.email }}</dd>
+      <dt class="col-sm-3 text-muted">Role</dt>
+      <dd class="col-sm-9"><span class="badge text-bg-secondary">{{ user_obj.get_role_display }}</span></dd>
+      <dt class="col-sm-3 text-muted">Last login</dt>
+      <dd class="col-sm-9">{{ user_obj.last_login|date:"Y-m-d H:i" }}</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+  <a href="{% url 'account_change_password' %}" class="btn btn-outline-primary">Change password</a>
+  <a href="{% url 'account_email' %}" class="btn btn-outline-secondary">Manage emails</a>
+</div>
 {% endblock %}

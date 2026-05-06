@@ -2,79 +2,123 @@
 {% block title %}Analytics · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>Analytics</h1>
+<h1 class="h3 mb-3">Analytics</h1>
 
-<form method="get" class="filter-bar" role="search">
-  {{ filter.form.carrier.label_tag }} {{ filter.form.carrier }}
-  {{ filter.form.issue_type.label_tag }} {{ filter.form.issue_type }}
-  {{ filter.form.causing_party.label_tag }} {{ filter.form.causing_party }}
-  {{ filter.form.issue_date_from.label_tag }} {{ filter.form.issue_date_from }}
-  {{ filter.form.issue_date_to.label_tag }} {{ filter.form.issue_date_to }}
-  <button type="submit">Apply</button>
-  <a href="{% url 'incidents:analytics' %}" class="btn-link">Reset</a>
+<form method="get" class="card card-body shadow-sm border-0 mb-3" role="search">
+  <div class="row g-2 align-items-end">
+    <div class="col-6 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Carrier</label>
+      {{ filter.form.carrier }}
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label small text-uppercase text-muted mb-1">Issue type</label>
+      {{ filter.form.issue_type }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Causing party</label>
+      {{ filter.form.causing_party }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Date from</label>
+      {{ filter.form.issue_date_from }}
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-uppercase text-muted mb-1">Date to</label>
+      {{ filter.form.issue_date_to }}
+    </div>
+    <div class="col-12 col-md-auto d-flex gap-2 align-self-end">
+      <button type="submit" class="btn btn-primary">Apply</button>
+      <a href="{% url 'incidents:analytics' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </div>
 </form>
 
-<p class="muted">{{ total }} incident{{ total|pluralize }} match the filter.</p>
+<p class="text-muted small">{{ total }} incident{{ total|pluralize }} match the filter.</p>
 
-<div class="grid two">
-  <section>
-    <h2>By carrier</h2>
-    <table class="data">
-      <thead><tr><th>Carrier</th><th>Count</th></tr></thead>
-      <tbody>
-      {% for row in by_carrier %}
-        <tr><td>{{ row.carrier__name|default:"(unknown)" }}</td><td>{{ row.n }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
+<div class="row g-3">
+  <div class="col-12 col-md-6">
+    <section class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 text-muted mb-3">By carrier</h2>
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Carrier</th><th class="text-end">Count</th></tr></thead>
+          <tbody>
+          {% for row in by_carrier %}
+            <tr><td>{{ row.carrier__name|default:"(unknown)" }}</td><td class="text-end fw-medium">{{ row.n }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-  <section>
-    <h2>By issue type</h2>
-    <table class="data">
-      <thead><tr><th>Issue type</th><th>Count</th></tr></thead>
-      <tbody>
-      {% for row in by_issue %}
-        <tr><td>{{ row.issue_type__name|default:"(unknown)" }}</td><td>{{ row.n }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  <div class="col-12 col-md-6">
+    <section class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 text-muted mb-3">By issue type</h2>
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Issue type</th><th class="text-end">Count</th></tr></thead>
+          <tbody>
+          {% for row in by_issue %}
+            <tr><td>{{ row.issue_type__name|default:"(unknown)" }}</td><td class="text-end fw-medium">{{ row.n }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-  <section>
-    <h2>By causing party</h2>
-    <table class="data">
-      <thead><tr><th>Party</th><th>Count</th></tr></thead>
-      <tbody>
-      {% for row in by_party %}
-        <tr><td>{{ row.causing_party }}</td><td>{{ row.n }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  <div class="col-12 col-md-4">
+    <section class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 text-muted mb-3">By causing party</h2>
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Party</th><th class="text-end">Count</th></tr></thead>
+          <tbody>
+          {% for row in by_party %}
+            <tr><td>{{ row.causing_party }}</td><td class="text-end fw-medium">{{ row.n }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-  <section>
-    <h2>By status</h2>
-    <table class="data">
-      <thead><tr><th>Status</th><th>Count</th></tr></thead>
-      <tbody>
-      {% for row in by_status %}
-        <tr><td>{{ row.status }}</td><td>{{ row.n }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  <div class="col-12 col-md-4">
+    <section class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 text-muted mb-3">By status</h2>
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+          <tbody>
+          {% for row in by_status %}
+            <tr>
+              <td>
+                <span class="badge status-pill status-{{ row.status|lower }}">{{ row.status }}</span>
+              </td>
+              <td class="text-end fw-medium">{{ row.n }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-  <section>
-    <h2>By year</h2>
-    <table class="data">
-      <thead><tr><th>Year</th><th>Count</th></tr></thead>
-      <tbody>
-      {% for row in by_year %}
-        <tr><td>{{ row.y }}</td><td>{{ row.n }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  <div class="col-12 col-md-4">
+    <section class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 text-muted mb-3">By year</h2>
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Year</th><th class="text-end">Count</th></tr></thead>
+          <tbody>
+          {% for row in by_year %}
+            <tr><td>{{ row.y }}</td><td class="text-end fw-medium">{{ row.n }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </div>
 {% endblock %}

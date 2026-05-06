@@ -136,6 +136,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "shiptrack.wsgi.application"
 ASGI_APPLICATION = "shiptrack.asgi.application"
 
+# Map Django message levels to Bootstrap 5 alert variants. Django's "error"
+# tag must become "danger" so the alert-{tag} class exists.
+from django.contrib.messages import constants as _msg_constants  # noqa: E402
+
+MESSAGE_TAGS = {
+    _msg_constants.DEBUG: "secondary",
+    _msg_constants.INFO: "info",
+    _msg_constants.SUCCESS: "success",
+    _msg_constants.WARNING: "warning",
+    _msg_constants.ERROR: "danger",
+}
+
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
