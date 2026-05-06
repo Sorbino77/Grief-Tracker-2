@@ -371,22 +371,21 @@ textarea.form-control { min-height: 90px; }
   white-space: nowrap;
   background: var(--bs-tertiary-bg);
   border-bottom: 1px solid var(--bs-border-color);
-  position: sticky;
-  top: 64px;
-  z-index: 2;
 }
 .pivot-table thead th.text-end { text-align: right; }
 
-/* Sticky first column so row labels stay visible while you scroll a wide pivot. */
+/* Sticky first column so row labels stay visible while you scroll a wide
+   pivot horizontally. We deliberately do NOT make the thead sticky — sticky
+   inside `.table-responsive` (overflow-x: auto) interacts badly with the
+   page's vertical scroll container, leaking tbody rows above the header. */
 .pivot-table thead th:first-child,
 .pivot-table tbody td:first-child,
 .pivot-table tfoot td:first-child {
   position: sticky;
   left: 0;
-  background: var(--bs-body-bg);
   z-index: 1;
 }
-.pivot-table thead th:first-child { z-index: 3; }
+.pivot-table thead th:first-child { background: var(--bs-tertiary-bg); z-index: 2; }
 .pivot-table tfoot td:first-child { background: var(--pivot-total-bg); }
 [data-bs-theme="light"] .pivot-table tbody td:first-child { background: #ffffff; }
 [data-bs-theme="dark"]  .pivot-table tbody td:first-child { background: #111827; }
@@ -399,7 +398,7 @@ textarea.form-control { min-height: 90px; }
      stays transparent. */
   background: transparent;
   font-variant-numeric: tabular-nums;
-  transition: background 120ms ease, outline-color 120ms ease;
+  transition: background 120ms ease, box-shadow 120ms ease;
 }
 /* Non-zero cells: the template sets style="--cell-ratio: <0..100>". Use that
    to compose an alpha that ramps from --heat-alpha-base (floor) to
@@ -423,10 +422,11 @@ textarea.form-control { min-height: 90px; }
   );
 }
 
-/* Hotspot: the cell holding the max value gets a subtle ring + bold weight. */
+/* Hotspot: the cell holding the max value gets an inset ring + bold weight.
+   `box-shadow: inset` avoids the clipping you'd get with `outline` on cells
+   that live inside an overflow-x:auto wrapper or have position:sticky. */
 .pivot-table .pivot-cell.is-max {
-  outline: 2px solid rgba(var(--heat-rgb), .55);
-  outline-offset: -3px;
+  box-shadow: inset 0 0 0 2px rgba(var(--heat-rgb), .7);
   font-weight: 700;
 }
 

@@ -51,7 +51,8 @@
       "Bash(grep -F -e -- \"pivot-cell\")",
       "Bash(rm -f cookies.txt body.html)",
       "Bash(curl -sS -o /dev/null -w '%{size_download}' http://127.0.0.1:8000/static/css/styles.css)",
-      "Bash(echo \"css size: $\\(curl -sS -o /dev/null -w '%{size_download}' http://127.0.0.1:8000/static/css/styles.css\\) bytes\")"
+      "Bash(echo \"css size: $\\(curl -sS -o /dev/null -w '%{size_download}' http://127.0.0.1:8000/static/css/styles.css\\) bytes\")",
+      "Bash(curl -sS -o /dev/null -w \"%{size_download} bytes\\\\n\" http://127.0.0.1:8000/static/css/styles.css)"
     ]
   }
 }
