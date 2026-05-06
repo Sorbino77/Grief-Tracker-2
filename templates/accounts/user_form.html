@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}New user · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Invite a new user</h1>
+<p class="muted">
+  An account is created immediately. Share the username and the password you set
+  with the new user, and ask them to change it on first login via
+  <code>/accounts/password/change/</code>.
+</p>
+
+<form method="post" class="stacked-form" novalidate>
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    <p>
+      <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} *{% endif %}
+      </label>
+      {{ field }}
+      {% if field.help_text %}<small class="help">{{ field.help_text|safe }}</small>{% endif %}
+      {% for err in field.errors %}<small class="error">{{ err }}</small>{% endfor %}
+    </p>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Create user</button>
+  <a href="{% url 'accounts:user_list' %}" class="btn-link">Cancel</a>
+</form>
+{% endblock %}

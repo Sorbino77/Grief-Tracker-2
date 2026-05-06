@@ -1,0 +1,66 @@
+"""Account-management forms used by the in-app admin pages."""
+
+from __future__ import annotations
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
+from .models import Role, User
+
+
+class UserCreateForm(UserCreationForm):
+    """Admin-side 'invite a teammate' form.
+
+    Uses Django's ``UserCreationForm`` as the base so we get the standard
+    password validators (12-char min, common-password blocklist, etc.) for
+    free, then adds the email + role fields and enforces email uniqueness
+    and a strong password explicitly (defence in depth — the model already
+    has ``unique=True`` on email).
+    """
+
+    email = forms.EmailField(required=True)
+    role = forms.ChoiceField(choices=Role.choices, initial=Role.VIEWER)
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "role")
+
+    def clean_email(self) -> str:
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        if not email:
+            raise ValidationError("Email is required.")
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError("A user with this email already exists.")
+        return email
+
+    def clean_username(self) -> str:
+        username = (self.cleaned_data.get("username") or "").strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("A user with this username already exists.")
+        return username
+
+    def _post_clean(self) -> None:
+        # Run Django's password validators against the user instance so that
+        # UserAttributeSimilarityValidator can compare against the username.
+        super()._post_clean()  # type: ignore[misc]
+        password = self.cleaned_data.get("password2")
+        if password:
+            try:
+                validate_password(password, self.instance)
+            except ValidationError as e:
+                self.add_error("password2", e)
+
+    def save(self, commit: bool = True) -> User:
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        user.role = self.cleaned_data["role"]
+        # Mirror admin's behaviour for staff/superuser: only Admins get is_staff
+        # so they can reach Django admin if they need it. Editors/viewers
+        # never get is_staff or is_superuser.
+        user.is_staff = user.role == Role.ADMIN
+        user.is_superuser = False
+        if commit:
+            user.save()
+        return user
