@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Profile · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Your profile</h1>
+<dl class="kv">
+  <dt>Username</dt><dd>{{ user_obj.username }}</dd>
+  <dt>Email</dt><dd>{{ user_obj.email }}</dd>
+  <dt>Role</dt><dd>{{ user_obj.get_role_display }}</dd>
+  <dt>Last login</dt><dd>{{ user_obj.last_login|date:"Y-m-d H:i" }}</dd>
+</dl>
+<p>
+  <a href="{% url 'account_change_password' %}" class="btn">Change password</a>
+  <a href="{% url 'account_email' %}" class="btn">Manage emails</a>
+</p>
+{% endblock %}

@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(DJANGO_SECRET_KEY=dummy DJANGO_DEBUG=True USE_POSTGRES=False uv run mypy accounts grief grieftracker manage.py)",
+      "Bash(uv run *)",
+      "Bash(curl -sf http://127.0.0.1:8000/healthz/)",
+      "Bash(curl -sS -i http://127.0.0.1:8000/healthz/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code} location=%{redirect_url}\\\\n\" http://127.0.0.1:8000/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code} location=%{redirect_url}\\\\n\" http://127.0.0.1:8000/grief/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8000/api/v1/records/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code} location=%{redirect_url}\\\\n\" http://127.0.0.1:8000/admin/)",
+      "Bash(PGPASSWORD=Ac6smuaf1991. psql -h localhost -U grief -d grieftracker -tAc \"SELECT count\\(*\\) AS total, count\\(*\\) FILTER \\(WHERE status='RESOLVED'\\) AS resolved, count\\(*\\) FILTER \\(WHERE status='ONGOING'\\) AS ongoing FROM grief_griefrecord;\")",
+      "Bash(curl -sS -H 'Authorization: Token 74f8035e717e52d4b441cf5cd55f7ec44ebc1a8e' 'http://127.0.0.1:8000/api/v1/records/?ordering=-issue_date')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('search hits =', d['count']\\)\")",
+      "Bash(rm -rf __pycache__ .mypy_cache .pytest_cache .ruff_cache)",
+      "Bash(rm -rf grieftracker/__pycache__ grief/__pycache__ grief/management/__pycache__ grief/management/commands/__pycache__ grief/migrations/__pycache__ accounts/__pycache__ accounts/migrations/__pycache__ tests/__pycache__)",
+      "Bash(mv grief *)",
+      "Bash(mv grieftracker *)",
+      "Bash(mv templates/grief templates/incidents)",
+      "Bash(mv grief_list.html incident_list.html)",
+      "Bash(mv grief_detail.html incident_detail.html)",
+      "Bash(mv grief_form.html incident_form.html)",
+      "Bash(DJANGO_SECRET_KEY=dummy DJANGO_DEBUG=True USE_POSTGRES=False uv run mypy accounts incidents shiptrack manage.py)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8000/healthz/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code} location=%{redirect_url}\\\\n\" http://127.0.0.1:8000/incidents/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8000/api/v1/incidents/)",
+      "Bash(curl -sS -o /dev/null -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8000/admin/)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count =', d['count']\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('carriers =', d['count']\\)\")",
+      "Bash(curl -sS http://127.0.0.1:8000/healthz/)"
+    ]
+  }
+}

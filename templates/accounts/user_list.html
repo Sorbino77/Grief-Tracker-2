@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Users · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Users</h1>
+<table class="data">
+  <thead>
+    <tr><th>Username</th><th>Email</th><th>Role</th><th>Last login</th><th>Active</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.get_role_display }}</td>
+      <td>{{ u.last_login|date:"Y-m-d H:i"|default:"—" }}</td>
+      <td>{% if u.is_active %}yes{% else %}no{% endif %}</td>
+      <td>
+        <form method="post" action="{% url 'accounts:change_role' u.pk %}" class="inline-form">
+          {% csrf_token %}
+          <select name="role" aria-label="Change role for {{ u.username }}">
+            {% for value, label in Role.choices %}
+              <option value="{{ value }}" {% if u.role == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

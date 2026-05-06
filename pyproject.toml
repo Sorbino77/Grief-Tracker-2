@@ -1,0 +1,103 @@
+[project]
+name = "shiptrack"
+version = "0.1.0"
+description = "ShipTrack — multi-user shipment incident tracker (Django + DRF)."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "Django==5.0.6",
+    "djangorestframework==3.15.1",
+    "django-environ==0.11.2",
+    "django-allauth==0.63.3",
+    "django-axes==6.4.0",
+    "django-csp==3.8",
+    "django-permissions-policy==4.21.0",
+    "django-ratelimit==4.1.0",
+    "django-filter==24.2",
+    "psycopg[binary]==3.1.19",
+    "gunicorn==22.0.0",
+    "whitenoise==6.6.0",
+    "openpyxl==3.1.2",
+    "argon2-cffi==23.1.0",
+    "redis==5.0.4",
+    "django-redis==5.4.0",
+    "requests==2.32.3",
+    "pyjwt>=2.12.1",
+    "cryptography>=48.0.0",
+    "requests-oauthlib>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.2.1",
+    "pytest-django==4.8.0",
+    "pytest-cov==5.0.0",
+    "factory-boy==3.3.0",
+    "ruff==0.6.9",
+    "mypy==1.11.2",
+    "bandit==1.7.10",
+    "django-stubs[compatible-mypy]==5.0.4",
+    "djangorestframework-stubs[compatible-mypy]==3.15.1",
+    "types-requests",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["migrations", "staticfiles", "media", "__pycache__"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle / pyflakes
+    "I",             # isort
+    "B",             # flake8-bugbear
+    "UP",            # pyupgrade
+    "DJ",            # flake8-django
+    "S",             # bandit-style security
+    "C4",            # comprehensions
+    "SIM",           # simplify
+    "RUF",
+]
+ignore = [
+    "E501",
+    "S101",
+    "S308",
+    "B008",
+    "DJ001",
+    "RUF012",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]
+"conftest.py" = ["E402"]
+"**/management/commands/*.py" = ["S"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["accounts", "incidents", "shiptrack"]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+exclude = "migrations|staticfiles|media|__pycache__"
+
+[tool.django-stubs]
+django_settings_module = "shiptrack.settings"
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "conftest"]
+ignore_errors = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "staticfiles"]
+skips = ["B101"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "shiptrack.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-ra --strict-markers --tb=short"
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = ["security: tests that explicitly verify security headers/behaviour"]

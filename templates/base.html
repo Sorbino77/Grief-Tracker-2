@@ -1,0 +1,53 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ShipTrack{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="{% url 'incidents:list' %}">ShipTrack</a>
+  </div>
+  <nav>
+    {% if user.is_authenticated %}
+      <a href="{% url 'incidents:list' %}">Incidents</a>
+      <a href="{% url 'incidents:analytics' %}">Analytics</a>
+      {% if is_editor %}
+        <a href="{% url 'incidents:create' %}">New</a>
+        <a href="{% url 'incidents:import' %}">Import</a>
+      {% endif %}
+      {% if is_admin %}
+        <a href="{% url 'accounts:user_list' %}">Users</a>
+      {% endif %}
+      <a href="{% url 'accounts:profile' %}">{{ user.username }}</a>
+      <form method="post" action="{% url 'account_logout' %}" class="inline-form">
+        {% csrf_token %}
+        <button type="submit" class="link-button">Sign out</button>
+      </form>
+    {% else %}
+      <a href="{% url 'account_login' %}">Sign in</a>
+    {% endif %}
+  </nav>
+</header>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="msg msg-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <small>ShipTrack &middot; hardened with Django + OWASP best practices</small>
+</footer>
+</body>
+</html>

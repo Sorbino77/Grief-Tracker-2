@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Analytics · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Analytics</h1>
+
+<form method="get" class="filter-bar" role="search">
+  {{ filter.form.carrier.label_tag }} {{ filter.form.carrier }}
+  {{ filter.form.issue_type.label_tag }} {{ filter.form.issue_type }}
+  {{ filter.form.causing_party.label_tag }} {{ filter.form.causing_party }}
+  {{ filter.form.issue_date_from.label_tag }} {{ filter.form.issue_date_from }}
+  {{ filter.form.issue_date_to.label_tag }} {{ filter.form.issue_date_to }}
+  <button type="submit">Apply</button>
+  <a href="{% url 'incidents:analytics' %}" class="btn-link">Reset</a>
+</form>
+
+<p class="muted">{{ total }} incident{{ total|pluralize }} match the filter.</p>
+
+<div class="grid two">
+  <section>
+    <h2>By carrier</h2>
+    <table class="data">
+      <thead><tr><th>Carrier</th><th>Count</th></tr></thead>
+      <tbody>
+      {% for row in by_carrier %}
+        <tr><td>{{ row.carrier__name|default:"(unknown)" }}</td><td>{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>By issue type</h2>
+    <table class="data">
+      <thead><tr><th>Issue type</th><th>Count</th></tr></thead>
+      <tbody>
+      {% for row in by_issue %}
+        <tr><td>{{ row.issue_type__name|default:"(unknown)" }}</td><td>{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>By causing party</h2>
+    <table class="data">
+      <thead><tr><th>Party</th><th>Count</th></tr></thead>
+      <tbody>
+      {% for row in by_party %}
+        <tr><td>{{ row.causing_party }}</td><td>{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>By status</h2>
+    <table class="data">
+      <thead><tr><th>Status</th><th>Count</th></tr></thead>
+      <tbody>
+      {% for row in by_status %}
+        <tr><td>{{ row.status }}</td><td>{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>By year</h2>
+    <table class="data">
+      <thead><tr><th>Year</th><th>Count</th></tr></thead>
+      <tbody>
+      {% for row in by_year %}
+        <tr><td>{{ row.y }}</td><td>{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

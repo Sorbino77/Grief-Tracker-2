@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Incidents · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Incidents</h1>
+
+<form method="get" class="filter-bar" role="search">
+  {{ filter.form.q.label_tag }} {{ filter.form.q }}
+  {{ filter.form.status.label_tag }} {{ filter.form.status }}
+  {{ filter.form.causing_party.label_tag }} {{ filter.form.causing_party }}
+  {{ filter.form.carrier.label_tag }} {{ filter.form.carrier }}
+  {{ filter.form.issue_type.label_tag }} {{ filter.form.issue_type }}
+  {{ filter.form.issue_date_from.label_tag }} {{ filter.form.issue_date_from }}
+  {{ filter.form.issue_date_to.label_tag }} {{ filter.form.issue_date_to }}
+  <button type="submit">Apply</button>
+  <a href="{% url 'incidents:list' %}" class="btn-link">Reset</a>
+</form>
+
+<p class="muted">{{ page_obj.paginator.count }} incident{{ page_obj.paginator.count|pluralize }}</p>
+
+<table class="data">
+  <thead>
+    <tr>
+      <th>Primary ref</th>
+      <th>Ship ID</th>
+      <th>Supplier</th>
+      <th>Carrier</th>
+      <th>Issue type</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for r in page_obj %}
+    <tr>
+      <td><a href="{% url 'incidents:detail' r.pk %}">{{ r.primary_ref }}</a></td>
+      <td>{{ r.ship_id }}</td>
+      <td>{{ r.supplier_name }}</td>
+      <td>{{ r.carrier.name|default:"—" }}</td>
+      <td>{{ r.issue_type.name|default:"—" }}</td>
+      <td>{{ r.issue_date|date:"Y-m-d" }}</td>
+      <td><span class="pill pill-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
+      <td>
+        <a href="{% url 'incidents:detail' r.pk %}">view</a>
+        {% if is_editor %} · <a href="{% url 'incidents:edit' r.pk %}">edit</a>{% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="8" class="muted">No incidents match your filters.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if page_obj.has_other_pages %}
+<nav class="pager">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">‹ prev</a>{% endif %}
+  <span>page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">next ›</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

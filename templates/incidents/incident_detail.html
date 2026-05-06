@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ obj.primary_ref }} · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>{{ obj.primary_ref }}
+  <span class="pill pill-{{ obj.status|lower }}">{{ obj.get_status_display }}</span></h1>
+
+<dl class="kv">
+  <dt>Ship ID</dt><dd>{{ obj.ship_id|default:"—" }}</dd>
+  <dt>Transport order ref</dt><dd>{{ obj.transport_order_ref|default:"—" }}</dd>
+  <dt>Supplier</dt><dd>{{ obj.supplier_name|default:"—" }}</dd>
+  <dt>Country / Location</dt><dd>{{ obj.country|default:"—" }} / {{ obj.location.code|default:"—" }}</dd>
+  <dt>Carrier</dt><dd>{{ obj.carrier.name|default:"—" }}</dd>
+  <dt>Issue type</dt><dd>{{ obj.issue_type.name|default:"—" }}</dd>
+  <dt>Issue date</dt><dd>{{ obj.issue_date|date:"Y-m-d" }}</dd>
+  <dt>Image</dt><dd>{{ obj.get_image_available_display }}</dd>
+  <dt>Causing party</dt><dd>{{ obj.get_causing_party_display }}</dd>
+  <dt>Resolve date</dt><dd>{{ obj.resolve_date|date:"Y-m-d"|default:"—" }}</dd>
+  <dt>Note</dt><dd>{{ obj.note|linebreaksbr|default:"—" }}</dd>
+  <dt>Created</dt><dd>{{ obj.created_at|date:"Y-m-d H:i" }} by {{ obj.created_by|default:"system" }}</dd>
+  <dt>Updated</dt><dd>{{ obj.updated_at|date:"Y-m-d H:i" }} by {{ obj.updated_by|default:"system" }}</dd>
+</dl>
+
+<div class="actions">
+  <a href="{% url 'incidents:list' %}" class="btn-link">← back</a>
+  {% if is_editor %}
+    <a href="{% url 'incidents:edit' obj.pk %}" class="btn">Edit</a>
+    {% if obj.status != "RESOLVED" %}
+      <form method="post" action="{% url 'incidents:resolve' obj.pk %}" class="inline-form">
+        {% csrf_token %}<button type="submit" class="btn btn-primary">Mark resolved</button>
+      </form>
+    {% endif %}
+  {% endif %}
+  {% if is_admin %}
+    <form method="post" action="{% url 'incidents:delete' obj.pk %}" class="inline-form"
+          onsubmit="return confirm('Delete this incident? This cannot be undone.');">
+      {% csrf_token %}<button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "create" %}New incident{% else %}Edit {{ obj.primary_ref }}{% endif %} · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>{% if mode == "create" %}New incident{% else %}Edit {{ obj.primary_ref }}{% endif %}</h1>
+
+<form method="post" class="stacked-form" novalidate>
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    <p>
+      <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+      {{ field }}
+      {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+      {% for err in field.errors %}<small class="error">{{ err }}</small>{% endfor %}
+    </p>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{% url 'incidents:list' %}" class="btn-link">Cancel</a>
+</form>
+{% endblock %}

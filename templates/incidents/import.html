@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Import · ShipTrack{% endblock %}
+
+{% block content %}
+<h1>Import incidents</h1>
+
+<p class="muted">
+  Upload an .xlsx, .xlsm, or .csv file. Columns are auto-detected by header
+  name (e.g. <code>Primary Ref</code>, <code>Ship ID</code>, <code>Issue type</code>,
+  <code>Date</code>). Legacy headers (<code>K&amp;N REF</code>, <code>KN REF</code>,
+  <code>Kuehne ref</code>) are also recognised. Existing rows with the same
+  primary reference + issue type are updated, not duplicated.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="stacked-form">
+  {% csrf_token %}
+  {% for field in form %}
+    <p>
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+      {% for err in field.errors %}<small class="error">{{ err }}</small>{% endfor %}
+    </p>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+{% if report %}
+  <h2>Import report</h2>
+  <ul class="kpis">
+    <li><strong>{{ report.created }}</strong> created</li>
+    <li><strong>{{ report.updated }}</strong> updated</li>
+    <li><strong>{{ report.skipped }}</strong> skipped</li>
+    <li><strong>{{ report.errors|length }}</strong> errors</li>
+    {% if report.dry_run %}<li class="pill pill-ongoing">dry-run</li>{% endif %}
+  </ul>
+  {% if report.errors %}
+    <h3>First 50 errors</h3>
+    <table class="data">
+      <thead><tr><th>Row</th><th>Message</th></tr></thead>
+      <tbody>
+      {% for row, msg in report.errors|slice:":50" %}
+        <tr><td>{{ row }}</td><td>{{ msg }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endif %}
+{% endblock %}
