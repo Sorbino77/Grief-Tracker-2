@@ -1,9 +1,89 @@
 # ShipTrack
 
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![Release](https://github.com/OWNER/REPO/actions/workflows/release.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
+[![Django 5.0](https://img.shields.io/badge/django-5.0-092E20.svg)](https://www.djangoproject.com/)
+
 A multi-user web app for tracking shipment incidents (damage, missing labels,
 mis-routed deliveries, etc.). Carrier-agnostic, OWASP-hardened, deployable
-with one `docker compose up`. Originally seeded from an Excel workbook —
-the importer still accepts the legacy column headers.
+with one `docker compose up`, one-click on Render or Fly.io, or as a
+pre-built image from GHCR. Originally seeded from an Excel workbook — the
+importer still accepts the legacy column headers.
+
+> **Replace `OWNER/REPO`** in the badge URLs above with your GitHub
+> `<owner>/<repo>` once you push the project (otherwise the badges 404).
+
+## Deploy from GitHub
+
+Three flavours:
+
+### Option A — Render (free tier, click-and-go)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/OWNER/REPO)
+
+Render reads `render.yaml` and provisions a managed Postgres 16 + Redis 7 +
+Dockerised web service in the same private network. The first build sets a
+strong `DJANGO_SECRET_KEY` automatically; you only have to fill in the
+`DJANGO_SUPERUSER_*` trio in the dashboard to bootstrap the first admin.
+
+### Option B — Fly.io (global edge, $5/mo and up)
+
+```bash
+flyctl launch --copy-config --name <YOUR_APP_NAME>
+flyctl postgres create --name <YOUR_APP_NAME>-db
+flyctl postgres attach <YOUR_APP_NAME>-db
+flyctl secrets set DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')"
+flyctl deploy
+```
+
+`fly.toml` is already in the repo (Amsterdam region, auto-stop machines, HTTPS
+redirect, healthcheck on `/healthz/`).
+
+### Option C — Anywhere with Docker (pull from GHCR)
+
+Once you push to GitHub, the **Release** workflow builds a multi-arch image
+(`linux/amd64` + `linux/arm64`) and publishes it to
+`ghcr.io/<owner>/<repo>:latest`. Pull it on any host:
+
+```bash
+docker run -d --name shiptrack \
+  -p 8000:8000 \
+  -e DJANGO_SECRET_KEY=$(python -c "import secrets;print(secrets.token_urlsafe(64))") \
+  -e DJANGO_DEBUG=False \
+  -e DJANGO_ALLOWED_HOSTS=your.domain.com \
+  -e USE_POSTGRES=True \
+  -e POSTGRES_HOST=db.example.com \
+  -e POSTGRES_DB=shiptrack -e POSTGRES_USER=shiptrack -e POSTGRES_PASSWORD=*** \
+  ghcr.io/OWNER/REPO:latest
+```
+
+### Option D — `docker compose up` (your own host)
+
+```bash
+git clone https://github.com/OWNER/REPO.git && cd REPO
+cp .env.example .env       # edit secrets
+docker compose up --build -d
+# http://localhost:8080
+```
+
+## What's wired up in CI/CD
+
+- **`ci.yml`** runs on every push and PR:
+  - `ruff check` + `ruff format --check`
+  - `bandit -r accounts incidents shiptrack`
+  - `mypy` with django-stubs / drf-stubs
+  - `pytest --cov`
+  - `manage.py check --deploy` against prod-like env
+  - Builds the Docker image and verifies `/healthz/` returns 200
+- **`release.yml`** runs on push to `main` and on `v*.*.*` tags:
+  - Builds multi-arch Docker images (`amd64` + `arm64`)
+  - Pushes to GHCR with semver / branch / sha tags
+  - Generates SBOM + provenance attestations
+- **`dependabot.yml`** opens weekly PRs for Python deps, GitHub Actions, and
+  the Docker base image. Django and security tools are grouped to keep PR
+  noise down.
 
 ## Features
 

@@ -1,0 +1,68 @@
+# Render.com one-click blueprint.
+# Click the "Deploy to Render" button in the README, or run:
+#   `render blueprint launch` after pushing this repo to GitHub.
+
+databases:
+  - name: shiptrack-db
+    plan: free
+    databaseName: shiptrack
+    user: shiptrack
+    postgresMajorVersion: "16"
+
+services:
+  - type: redis
+    name: shiptrack-redis
+    plan: free
+    ipAllowList: []   # private — only the web service can reach it
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: shiptrack-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz/
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: shiptrack.settings
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false           # set in dashboard to your custom domain(s)
+        value: ".onrender.com"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "True"
+      - key: DJANGO_SESSION_COOKIE_SECURE
+        value: "True"
+      - key: DJANGO_CSRF_COOKIE_SECURE
+        value: "True"
+      - key: DJANGO_SECURE_HSTS_SECONDS
+        value: "31536000"
+      - key: USE_POSTGRES
+        value: "True"
+      - key: POSTGRES_HOST
+        fromDatabase: { name: shiptrack-db, property: host }
+      - key: POSTGRES_PORT
+        fromDatabase: { name: shiptrack-db, property: port }
+      - key: POSTGRES_DB
+        fromDatabase: { name: shiptrack-db, property: database }
+      - key: POSTGRES_USER
+        fromDatabase: { name: shiptrack-db, property: user }
+      - key: POSTGRES_PASSWORD
+        fromDatabase: { name: shiptrack-db, property: password }
+      - key: POSTGRES_SSLMODE
+        value: "require"
+      - key: REDIS_URL
+        fromService: { type: redis, name: shiptrack-redis, property: connectionString }
+      # Bootstrap the first admin on first deploy. CHANGE THE PASSWORD AFTERWARDS.
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

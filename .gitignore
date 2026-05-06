@@ -1,4 +1,4 @@
-# Secrets
+# Secrets — never commit a populated .env
 .env
 .env.*
 !.env.example
@@ -10,8 +10,11 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
+coverage.xml
 
 # Django
 db.sqlite3
@@ -20,8 +23,15 @@ staticfiles/
 media/
 logs/
 
+# Build / packaging
+dist/
+build/
+
 # Editors / OS
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local-only operator helpers (these reference your machine's paths/services)
+scripts/local-*.ps1

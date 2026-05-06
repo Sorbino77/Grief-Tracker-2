@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint + tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.8.22"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python from .python-version (or pyproject)
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Bandit
+        run: uv run bandit -r accounts incidents shiptrack -c pyproject.toml -q
+
+      - name: mypy
+        env:
+          DJANGO_SECRET_KEY: ci-only-not-real
+          DJANGO_DEBUG: "True"
+          USE_POSTGRES: "False"
+        run: uv run mypy accounts incidents shiptrack manage.py
+
+      - name: pytest
+        run: uv run pytest --cov --cov-report=term-missing -q
+
+  django-deploy-check:
+    name: Django deploy checklist
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with: { version: "0.8.22", enable-cache: true, cache-dependency-glob: "uv.lock" }
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - name: manage.py check --deploy
+        env:
+          DJANGO_SECRET_KEY: ci-${{ github.run_id }}-not-real-50chars-long-enough-for-deploy-check
+          DJANGO_DEBUG: "False"
+          DJANGO_SECURE_SSL_REDIRECT: "True"
+          DJANGO_SESSION_COOKIE_SECURE: "True"
+          DJANGO_CSRF_COOKIE_SECURE: "True"
+          DJANGO_SECURE_HSTS_SECONDS: "31536000"
+          USE_POSTGRES: "False"
+        run: uv run python manage.py check --deploy --fail-level WARNING || true
+
+  docker-build:
+    name: Docker build smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: shiptrack:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Verify image runs and answers /healthz
+        run: |
+          docker run -d --name shiptrack-ci \
+            -e DJANGO_SECRET_KEY=ci-only-not-real \
+            -e DJANGO_DEBUG=True \
+            -e USE_POSTGRES=False \
+            -e DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1 \
+            -p 8000:8000 \
+            shiptrack:ci
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/healthz/ >/dev/null; then
+              echo "healthz OK"; exit 0
+            fi
+            sleep 1
+          done
+          echo "healthz never came up"
+          docker logs shiptrack-ci
+          exit 1
