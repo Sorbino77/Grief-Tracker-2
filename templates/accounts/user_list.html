@@ -2,7 +2,10 @@
 {% block title %}Users · ShipTrack{% endblock %}
 
 {% block content %}
-<h1>Users</h1>
+<div class="page-head">
+  <h1>Users</h1>
+  <a href="{% url 'accounts:user_create' %}" class="btn btn-primary">+ New user</a>
+</div>
 <p class="muted">Admins can adjust roles below. You can't change your own role — ask another admin if you need to step down.</p>
 
 <table class="data">

@@ -31,7 +31,21 @@ the importer still accepts the legacy column headers.
 - **pytest** suite covering models, views, RBAC, security headers, CSRF,
   password validators, REST API, and the importer.
 
-## Quickstart
+## Easy launch
+
+Three ways, pick whichever fits:
+
+| Platform | One-shot command                  | What it does |
+|----------|----------------------------------|--------------|
+| **Windows** | **Double-click `start.bat`**   | Syncs deps → checks Postgres → migrates → seeds → opens the browser → starts the dev server |
+| **macOS / Linux** | `make up`                | Same as above (via `scripts/launch.sh`) |
+| **Any** (full prod-like stack) | `docker compose up --build -d` | Postgres + Redis + Django + nginx on port 8080 |
+
+For day-to-day commands, `make help` lists every shortcut (`make test`,
+`make lint`, `make migrate`, `make shell`, `make collectstatic`,
+`make docker-up`, …).
+
+## Production deploy with Docker
 
 ```bash
 # 1. Configure secrets (NEVER commit .env)

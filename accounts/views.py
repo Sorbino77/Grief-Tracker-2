@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
+from .forms import UserCreateForm
 from .models import Role, User
 from .permissions import role_required
 
@@ -20,6 +21,23 @@ def profile(request):
 def user_list(request):
     users = User.objects.order_by("username")
     return render(request, "accounts/user_list.html", {"users": users, "Role": Role})
+
+
+@role_required(Role.ADMIN)
+def user_create(request):
+    """Admin-only form to invite/create a teammate."""
+    if request.method == "POST":
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(
+                request,
+                f"User '{user.username}' created with role '{user.get_role_display()}'.",
+            )
+            return redirect("accounts:user_list")
+    else:
+        form = UserCreateForm()
+    return render(request, "accounts/user_form.html", {"form": form})
 
 
 @role_required(Role.ADMIN)
