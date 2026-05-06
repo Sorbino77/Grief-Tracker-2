@@ -30,12 +30,12 @@ def change_role(request, pk: int):
     if new_role not in dict(Role.choices):
         messages.error(request, "Invalid role.")
         return redirect("accounts:user_list")
-    # Prevent the last admin from demoting themselves.
+    # An admin cannot lower their own privileges. Prevents both
+    # accidental self-demotion AND a takeover scenario where a compromised
+    # admin session is used to leave only the attacker with admin rights.
     if request.user.pk == target.pk and new_role != Role.ADMIN:
-        admin_count = User.objects.filter(role=Role.ADMIN).count()
-        if admin_count <= 1:
-            messages.error(request, "Cannot demote the last admin.")
-            return redirect("accounts:user_list")
+        messages.error(request, "You can't change your own role. Ask another admin to do it.")
+        return redirect("accounts:user_list")
     target.role = new_role
     target.save(update_fields=["role"])
     messages.success(request, f"Updated {target.username} to {new_role}.")
