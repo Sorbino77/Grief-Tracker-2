@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from allauth.account.forms import (
+    LoginForm as AllauthLoginForm,
+    SignupForm as AllauthSignupForm,
+)
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.password_validation import validate_password
@@ -10,6 +14,14 @@ from django.core.exceptions import ValidationError
 from shiptrack.formhelpers import BootstrapFormMixin
 
 from .models import Role, User
+
+
+class StyledLoginForm(BootstrapFormMixin, AllauthLoginForm):
+    """Allauth login form with Bootstrap classes applied to every widget."""
+
+
+class StyledSignupForm(BootstrapFormMixin, AllauthSignupForm):
+    """Allauth signup form with Bootstrap classes applied to every widget."""
 
 
 class UserCreateForm(BootstrapFormMixin, UserCreationForm):

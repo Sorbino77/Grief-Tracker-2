@@ -212,6 +212,12 @@ ACCOUNT_RATE_LIMITS = {
     "login_failed": "5/5m",
     "signup": "20/d",
 }
+# Swap allauth's default forms for our Bootstrap-styled subclasses so the
+# login/signup inputs render with `form-control` / `form-check-input` classes.
+ACCOUNT_FORMS = {
+    "login": "accounts.forms.StyledLoginForm",
+    "signup": "accounts.forms.StyledSignupForm",
+}
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
