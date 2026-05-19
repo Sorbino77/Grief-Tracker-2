@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from allauth.account.forms import (
-    LoginForm as AllauthLoginForm,
-    SignupForm as AllauthSignupForm,
-)
+from allauth.account.forms import LoginForm as AllauthLoginForm
+from allauth.account.forms import SignupForm as AllauthSignupForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.password_validation import validate_password

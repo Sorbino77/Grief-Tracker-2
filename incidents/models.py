@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import contextlib
+import os
+import re
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -148,3 +153,79 @@ class Incident(TimeStampedModel):
         if user is not None:
             self.updated_by = user
         self.save()
+
+
+# ----- attachments -----------------------------------------------------------
+def _attachment_upload_path(instance: IncidentAttachment, filename: str) -> str:
+    """Compute the on-disk path for an uploaded attachment.
+
+    Layout: ``incident_attachments/<incident_pk>/<uuid-hex>_<safe-name>``.
+
+    Why a UUID prefix: prevents collisions when two users upload files with
+    the same name, and stops one user from guessing another's path. Why we
+    still keep the (sanitised) original name: it makes the file recognisable
+    when an admin browses MEDIA_ROOT directly.
+    """
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "_", os.path.basename(filename)).strip("._-")
+    if not safe:
+        safe = "file"
+    safe = safe[:80]
+    return f"incident_attachments/{instance.incident_id}/{uuid.uuid4().hex}_{safe}"
+
+
+class IncidentAttachment(models.Model):
+    """A file attached to an Incident (photo, PDF, supplier email, etc.).
+
+    Files are written to ``MEDIA_ROOT`` under a per-incident folder with a
+    UUID-prefixed filename (see ``_attachment_upload_path``). The view layer
+    validates extension + size before the model ever sees the data.
+    """
+
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to=_attachment_upload_path, max_length=255)
+    original_name = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=120, blank=True)
+    size_bytes = models.PositiveIntegerField(default=0)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="uploaded_attachments",
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-uploaded_at", "-id"]
+        indexes = [models.Index(fields=["incident", "-uploaded_at"])]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return self.original_name or self.file.name
+
+    @property
+    def human_size(self) -> str:
+        """Human-readable size, e.g. ``"1.2 MB"`` / ``"680 KB"`` / ``"42 B"``."""
+        n = float(self.size_bytes or 0)
+        for unit in ("B", "KB", "MB", "GB"):
+            if n < 1024 or unit == "GB":
+                return f"{n:.0f} {unit}" if unit == "B" else f"{n:.1f} {unit}"
+            n /= 1024
+        return f"{n:.1f} GB"
+
+    @property
+    def extension(self) -> str:
+        return os.path.splitext(self.original_name or self.file.name)[1].lower()
+
+    def delete(self, *args, **kwargs):
+        """Remove the on-disk file when the row is deleted.
+
+        ``FileField`` does NOT auto-delete the file (intentional, to make
+        rollbacks safer). We do here so an admin clicking "Delete attachment"
+        actually frees the disk space."""
+        storage, path = self.file.storage, self.file.name
+        super().delete(*args, **kwargs)
+        if path:
+            # Best-effort cleanup: a missing file or a locked one on Windows
+            # shouldn't prevent the DB-level delete from succeeding.
+            with contextlib.suppress(Exception):
+                storage.delete(path)

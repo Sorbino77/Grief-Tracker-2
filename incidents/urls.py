@@ -13,4 +13,6 @@ urlpatterns = [
     path("<int:pk>/edit/", views.incident_edit, name="edit"),
     path("<int:pk>/delete/", views.incident_delete, name="delete"),
     path("<int:pk>/resolve/", views.incident_resolve, name="resolve"),
+    path("<int:pk>/attachments/upload/", views.attachment_upload, name="attachment_upload"),
+    path("attachments/<int:pk>/delete/", views.attachment_delete, name="attachment_delete"),
 ]

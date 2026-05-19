@@ -206,7 +206,10 @@ LOGOUT_REDIRECT_URL = "account_login"
 
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+# "none" → don't send the post-signup confirmation mail at all. New users
+# can sign in immediately. (Switch back to "optional" or "mandatory" once
+# you have real SMTP creds wired up.)
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_RATE_LIMITS = {
     "login_failed": "5/5m",
@@ -218,6 +221,19 @@ ACCOUNT_FORMS = {
     "login": "accounts.forms.StyledLoginForm",
     "signup": "accounts.forms.StyledSignupForm",
 }
+
+# ---------------------------------------------------------------------------
+# Email
+# ---------------------------------------------------------------------------
+# Allauth sends a verification email on signup (and password-reset mail later).
+# In dev we print them to the runserver console instead of opening an SMTP
+# connection to localhost:25 — otherwise POST /accounts/signup/ would crash
+# with WinError 10061 / ConnectionRefusedError on machines without a local
+# mail server. Production deployments should set EMAIL_BACKEND + SMTP creds
+# via env vars in their own settings overlay or .env.
+if DEBUG or TESTING:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "ShipTrack <no-reply@shiptrack.local>"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_PROVIDERS = {
     "google": {

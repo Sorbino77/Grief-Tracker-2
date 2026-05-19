@@ -82,6 +82,62 @@ class IncidentForm(BootstrapFormMixin, forms.ModelForm):
         return cleaned
 
 
+# Conservative whitelist for incident attachments. We deliberately exclude
+# executables, scripts, and HTML/SVG (which can carry script payloads) — any
+# file extension not in this set is rejected by the form before it reaches
+# the storage layer.
+ALLOWED_ATTACHMENT_EXTENSIONS: frozenset[str] = frozenset(
+    {
+        ".pdf",
+        ".txt",
+        ".csv",
+        ".xls",
+        ".xlsx",
+        ".xlsm",
+        ".doc",
+        ".docx",
+        ".ppt",
+        ".pptx",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".zip",
+    }
+)
+MAX_ATTACHMENT_BYTES: int = 25 * 1024 * 1024  # 25 MB, matches the Excel import limit.
+
+
+class AttachmentUploadForm(BootstrapFormMixin, forms.Form):
+    """Upload a single file to attach to an Incident.
+
+    Extension + size are validated here so the view doesn't have to repeat
+    the rules; the view just calls ``form.is_valid()`` and reads the
+    ``UploadedFile`` from ``cleaned_data["file"]``.
+    """
+
+    file = forms.FileField(
+        label="Attachment",
+        help_text=(
+            "Allowed types: PDF, Office (xls/xlsx/xlsm/doc/docx/ppt/pptx), "
+            "images (jpg/jpeg/png/gif/webp), text (txt/csv), or zip. "
+            f"Max {MAX_ATTACHMENT_BYTES // (1024 * 1024)} MB."
+        ),
+    )
+
+    def clean_file(self):
+        f = self.cleaned_data["file"]
+        ext = ("." + f.name.rsplit(".", 1)[-1].lower()) if "." in f.name else ""
+        if ext not in ALLOWED_ATTACHMENT_EXTENSIONS:
+            allowed = ", ".join(sorted(ALLOWED_ATTACHMENT_EXTENSIONS))
+            raise ValidationError(f"Unsupported file type '{ext or '(none)'}'. Allowed: {allowed}.")
+        if f.size and f.size > MAX_ATTACHMENT_BYTES:
+            mb = MAX_ATTACHMENT_BYTES // (1024 * 1024)
+            raise ValidationError(f"File too large. Maximum size is {mb} MB.")
+        return f
+
+
 class ImportUploadForm(BootstrapFormMixin, forms.Form):
     file = forms.FileField(help_text="Upload .xlsx / .xlsm / .csv. Max 25 MB.")
     sheet_name = forms.CharField(

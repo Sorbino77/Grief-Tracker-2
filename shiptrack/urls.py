@@ -1,5 +1,7 @@
 """Top-level URL routes."""
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
@@ -23,3 +25,9 @@ urlpatterns = [
     path("api/", include("incidents.api_urls")),
     path("", RedirectView.as_view(pattern_name="incidents:list", permanent=False)),
 ]
+
+# Serve user-uploaded files (incident attachments) from MEDIA_URL while DEBUG
+# is on. In production these should be served by Nginx / object storage — never
+# by Django.
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

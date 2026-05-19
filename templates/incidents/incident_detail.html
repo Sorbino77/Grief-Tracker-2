@@ -75,4 +75,78 @@
     </form>
   {% endif %}
 </div>
+
+{# ---------- attachments ---------- #}
+<div class="card shadow-sm border-0 mt-4">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Attachments</h2>
+
+    {% if attachments %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-end">Size</th>
+              <th>Uploaded</th>
+              <th>By</th>
+              {% if is_editor %}<th aria-label="Actions"></th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in attachments %}
+              <tr>
+                <td>
+                  <a href="{{ a.file.url }}" target="_blank" rel="noopener">
+                    {{ a.original_name|default:a.file.name }}
+                  </a>
+                </td>
+                <td class="text-end text-muted">{{ a.human_size }}</td>
+                <td class="text-muted">{{ a.uploaded_at|date:"Y-m-d H:i" }}</td>
+                <td class="text-muted">{{ a.uploaded_by|default:"—" }}</td>
+                {% if is_editor %}
+                  <td class="text-end">
+                    <form method="post" action="{% url 'incidents:attachment_delete' a.pk %}"
+                          class="d-inline m-0"
+                          onsubmit="return confirm('Delete this attachment?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-3">No files attached yet.</p>
+    {% endif %}
+
+    {% if is_editor %}
+      <hr class="my-3">
+      <form method="post" action="{% url 'incidents:attachment_upload' obj.pk %}"
+            enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-md-8">
+            <label for="{{ attachment_form.file.id_for_label }}" class="form-label">
+              {{ attachment_form.file.label }}
+            </label>
+            {{ attachment_form.file }}
+            {% if attachment_form.file.help_text %}
+              <div class="form-text">{{ attachment_form.file.help_text }}</div>
+            {% endif %}
+            {% for err in attachment_form.file.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12 col-md-auto">
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

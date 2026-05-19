@@ -18,9 +18,9 @@ from accounts.models import Role
 from accounts.permissions import role_required
 
 from .filters import IncidentFilter
-from .forms import ImportUploadForm, IncidentForm
+from .forms import AttachmentUploadForm, ImportUploadForm, IncidentForm
 from .importers import ALLOWED_EXTENSIONS, IncidentImporter
-from .models import Incident, Status
+from .models import Incident, IncidentAttachment, Status
 from .pivot import DIMENSIONS, NONE_KEY, build_pivot, dimension_choices
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,63 @@ def incident_detail(request, pk: int):
         Incident.objects.select_related("carrier", "issue_type", "location", "created_by", "updated_by"),
         pk=pk,
     )
-    return render(request, "incidents/incident_detail.html", {"obj": obj})
+    attachments = obj.attachments.select_related("uploaded_by").all()
+    return render(
+        request,
+        "incidents/incident_detail.html",
+        {
+            "obj": obj,
+            "attachments": attachments,
+            "attachment_form": AttachmentUploadForm(),
+        },
+    )
+
+
+@role_required(Role.ADMIN, Role.EDITOR)
+@ratelimit(key="user", rate="30/m", method="POST", block=True)
+@require_http_methods(["POST"])
+def attachment_upload(request, pk: int):
+    """Attach a single uploaded file to the given incident.
+
+    Editor/admin only. Extension + size are validated in
+    ``AttachmentUploadForm``; the model's ``upload_to`` callable picks the
+    final on-disk path. We capture the original filename, declared content
+    type, and size for display."""
+    incident = get_object_or_404(Incident, pk=pk)
+    form = AttachmentUploadForm(request.POST, request.FILES)
+    if not form.is_valid():
+        # Bounce back to the detail page with errors rendered inline.
+        attachments = incident.attachments.select_related("uploaded_by").all()
+        return render(
+            request,
+            "incidents/incident_detail.html",
+            {"obj": incident, "attachments": attachments, "attachment_form": form},
+            status=400,
+        )
+    uploaded = form.cleaned_data["file"]
+    IncidentAttachment.objects.create(
+        incident=incident,
+        file=uploaded,
+        original_name=uploaded.name[:255],
+        content_type=(uploaded.content_type or "")[:120],
+        size_bytes=uploaded.size or 0,
+        uploaded_by=request.user,
+    )
+    messages.success(request, f"Attached '{uploaded.name}'.")
+    return redirect("incidents:detail", pk=incident.pk)
+
+
+@role_required(Role.ADMIN, Role.EDITOR)
+@require_http_methods(["POST"])
+def attachment_delete(request, pk: int):
+    """Delete an attachment. The override on ``IncidentAttachment.delete``
+    also removes the file from disk so we don't accumulate orphans."""
+    attachment = get_object_or_404(IncidentAttachment.objects.select_related("incident"), pk=pk)
+    incident_pk = attachment.incident_id
+    name = attachment.original_name or attachment.file.name
+    attachment.delete()
+    messages.success(request, f"Removed '{name}'.")
+    return redirect("incidents:detail", pk=incident_pk)
 
 
 @role_required(Role.ADMIN, Role.EDITOR)
