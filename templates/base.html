@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}ShipTrack{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
-  {# ?v= is a manual cache-buster: bump it whenever styles.css changes so
-     browsers don't serve a stale copy (dev serves only Last-Modified, which
-     browsers may not revalidate). #}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=3">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   {# Sync script: resolves stored theme + sets <html data-bs-theme> before paint. #}
   <script src="{% static 'js/theme.js' %}"></script>
   {% block head_extra %}{% endblock %}

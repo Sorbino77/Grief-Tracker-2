@@ -186,16 +186,16 @@ a { transition: color 120ms ease; }
 }
 .table tbody td a { font-weight: 500; }
 
+/* Sticky thead under the navbar */
 .table-responsive {
   border-radius: var(--bs-border-radius-lg);
 }
 .card .table-responsive { border-radius: inherit; }
-/* NOTE: we deliberately do NOT make `thead th` sticky here. Because
-   `.table-responsive` sets `overflow-x: auto`, the browser also makes it a
-   *vertical* scroll container, so `position: sticky; top: 64px` sticks the
-   header 64px below the wrapper's own top edge instead of under the navbar —
-   which pushes the header down into the table and leaks the first row above
-   it. (Same reason the pivot table avoids a sticky thead — see section 11.) */
+.card > .table-responsive > .table thead th {
+  position: sticky;
+  top: 64px;
+  z-index: 2;
+}
 
 /* ---------- 7. buttons ---------- */
 .btn {
