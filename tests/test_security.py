@@ -61,9 +61,9 @@ def test_admin_cannot_demote_self_via_change_role_view(client, admin_user, targe
     admin_user.refresh_from_db()
     assert admin_user.role == "admin", "admin role must be preserved"
     # Error message bubbles up via Django messages framework.
-    assert any(
-        "your own role" in m.message.lower() for m in resp.context["messages"]
-    ), "expected a friendly error message about not changing your own role"
+    assert any("your own role" in m.message.lower() for m in resp.context["messages"]), (
+        "expected a friendly error message about not changing your own role"
+    )
 
 
 def test_admin_can_still_change_other_users(client, admin_user, editor_user):

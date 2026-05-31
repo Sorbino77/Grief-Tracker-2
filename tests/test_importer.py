@@ -129,7 +129,7 @@ def test_csv_import():
 
 def test_legacy_kn_ref_header_still_works():
     """Old K+N spreadsheets must still import."""
-    csv_bytes = io.BytesIO(b"K&N REF,Carrier,Issue type,Date,Status\n" b"LEG-1,DHL,X,2025-02-01,ONGOING\n")
+    csv_bytes = io.BytesIO(b"K&N REF,Carrier,Issue type,Date,Status\nLEG-1,DHL,X,2025-02-01,ONGOING\n")
     importer = IncidentImporter()
     report = importer.import_stream(csv_bytes, filename="legacy.csv")
     assert report.created == 1

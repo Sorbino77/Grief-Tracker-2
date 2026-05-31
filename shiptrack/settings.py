@@ -204,8 +204,10 @@ LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "incidents:list"
 LOGOUT_REDIRECT_URL = "account_login"
 
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_REQUIRED = True
+# allauth 65.x API: replaces the deprecated ACCOUNT_AUTHENTICATION_METHOD /
+# ACCOUNT_EMAIL_REQUIRED. Login by email or username; both required at signup.
+ACCOUNT_LOGIN_METHODS = {"email", "username"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 # "none" → don't send the post-signup confirmation mail at all. New users
 # can sign in immediately. (Switch back to "optional" or "mandatory" once
 # you have real SMTP creds wired up.)
@@ -349,17 +351,24 @@ SECURE_HSTS_SECONDS = env("DJANGO_SECURE_HSTS_SECONDS")
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-CSP_IMG_SRC = ("'self'", "data:")
-CSP_FONT_SRC = ("'self'",)
-CSP_CONNECT_SRC = ("'self'",)
-CSP_FRAME_ANCESTORS = ("'none'",)
-CSP_BASE_URI = ("'self'",)
-CSP_FORM_ACTION = ("'self'",)
-CSP_OBJECT_SRC = ("'none'",)
-CSP_INCLUDE_NONCE_IN = ("script-src",)
+# django-csp 4.x replaces the individual CSP_* settings (3.x) with a single
+# CONTENT_SECURITY_POLICY dict; SELF/NONE/NONCE come from csp.constants.
+from csp.constants import NONCE, NONE, SELF  # noqa: E402
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [SELF],
+        "script-src": [SELF, NONCE],
+        "style-src": [SELF, "'unsafe-inline'"],
+        "img-src": [SELF, "data:"],
+        "font-src": [SELF],
+        "connect-src": [SELF],
+        "frame-ancestors": [NONE],
+        "base-uri": [SELF],
+        "form-action": [SELF],
+        "object-src": [NONE],
+    },
+}
 
 PERMISSIONS_POLICY: dict[str, list[str]] = {
     "accelerometer": [],

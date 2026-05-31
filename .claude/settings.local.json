@@ -52,7 +52,9 @@
       "Bash(rm -f cookies.txt body.html)",
       "Bash(curl -sS -o /dev/null -w '%{size_download}' http://127.0.0.1:8000/static/css/styles.css)",
       "Bash(echo \"css size: $\\(curl -sS -o /dev/null -w '%{size_download}' http://127.0.0.1:8000/static/css/styles.css\\) bytes\")",
-      "Bash(curl -sS -o /dev/null -w \"%{size_download} bytes\\\\n\" http://127.0.0.1:8000/static/css/styles.css)"
+      "Bash(curl -sS -o /dev/null -w \"%{size_download} bytes\\\\n\" http://127.0.0.1:8000/static/css/styles.css)",
+      "PowerShell(uv pip freeze 2>&1)",
+      "PowerShell($env:DJANGO_DEBUG=\"True\"; Write-Output \"=== django check ===\"; uv run python manage.py check 2>&1 | Select-Object -Last 4; Write-Output \"=== tests ===\"; uv run pytest -q 2>&1 | Select-Object -Last 6)"
     ]
   }
 }
