@@ -200,7 +200,7 @@ class IncidentAttachment(models.Model):
         indexes = [models.Index(fields=["incident", "-uploaded_at"])]
 
     def __str__(self) -> str:  # pragma: no cover
-        return self.original_name or self.file.name
+        return self.original_name or self.file.name or "attachment"
 
     @property
     def human_size(self) -> str:
@@ -214,7 +214,8 @@ class IncidentAttachment(models.Model):
 
     @property
     def extension(self) -> str:
-        return os.path.splitext(self.original_name or self.file.name)[1].lower()
+        filename = self.original_name or self.file.name or ""
+        return os.path.splitext(filename)[1].lower()
 
     def delete(self, *args, **kwargs):
         """Remove the on-disk file when the row is deleted.
