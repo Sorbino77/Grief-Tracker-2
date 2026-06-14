@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Role, User
+from .models import AccessibilityPreferences, Role, User
 
 
 @admin.register(User)
@@ -46,3 +46,50 @@ class CustomUserAdmin(UserAdmin):
                 "You can't lower your own admin role. Ask another admin to do it.",
             )
         super().save_model(request, obj, form, change)
+
+
+@admin.register(AccessibilityPreferences)
+class AccessibilityPreferencesAdmin(admin.ModelAdmin):
+    list_display = ("user", "high_contrast_mode", "dyslexia_friendly_font", "reduced_motion", "large_touch_targets")
+    list_filter = (
+        "high_contrast_mode",
+        "dyslexia_friendly_font",
+        "reduced_motion",
+        "large_touch_targets",
+        "simplified_layout",
+        "font_size",
+        "colorblind_mode",
+    )
+    search_fields = ("user__username", "user__email")
+    readonly_fields = ("created_at", "updated_at")
+
+    fieldsets = (
+        ("User", {"fields": ("user",)}),
+        (
+            "Visual Accessibility",
+            {
+                "fields": (
+                    "high_contrast_mode",
+                    "dyslexia_friendly_font",
+                    "font_size",
+                    "colorblind_mode",
+                )
+            },
+        ),
+        (
+            "Motor Accessibility",
+            {
+                "fields": (
+                    "reduced_motion",
+                    "large_touch_targets",
+                    "keyboard_navigation_hints",
+                )
+            },
+        ),
+        (
+            "Cognitive Accessibility",
+            {"fields": ("simplified_layout", "reading_guide")},
+        ),
+        ("Audio & Content", {"fields": ("captions", "screen_reader_mode")}),
+        ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
+    )

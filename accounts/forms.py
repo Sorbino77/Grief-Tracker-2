@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 
 from shiptrack.formhelpers import BootstrapFormMixin
 
-from .models import Role, User
+from .models import AccessibilityPreferences, Role, User
 
 
 class StyledLoginForm(BootstrapFormMixin, AllauthLoginForm):
@@ -76,3 +76,54 @@ class UserCreateForm(BootstrapFormMixin, UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class AccessibilityPreferencesForm(BootstrapFormMixin, forms.ModelForm):
+    """Gaming-style accessibility settings form."""
+
+    class Meta:
+        model = AccessibilityPreferences
+        fields = [
+            "high_contrast_mode",
+            "dyslexia_friendly_font",
+            "font_size",
+            "colorblind_mode",
+            "reduced_motion",
+            "large_touch_targets",
+            "keyboard_navigation_hints",
+            "simplified_layout",
+            "reading_guide",
+            "captions",
+            "screen_reader_mode",
+        ]
+        widgets = {
+            "high_contrast_mode": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Increase color contrast for better visibility"}
+            ),
+            "dyslexia_friendly_font": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Use dyslexia-friendly font"}
+            ),
+            "font_size": forms.RadioSelect(attrs={"class": "form-check-input"}),
+            "colorblind_mode": forms.RadioSelect(attrs={"class": "form-check-input"}),
+            "reduced_motion": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Reduce animations and transitions"}
+            ),
+            "large_touch_targets": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Increase button and interactive element sizes"}
+            ),
+            "keyboard_navigation_hints": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Show keyboard navigation shortcuts"}
+            ),
+            "simplified_layout": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Hide advanced features"}
+            ),
+            "reading_guide": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Highlight current line with reading guide"}
+            ),
+            "captions": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Show captions for audio content"}
+            ),
+            "screen_reader_mode": forms.CheckboxInput(
+                attrs={"class": "form-check-input", "title": "Optimize for screen reader compatibility"}
+            ),
+        }

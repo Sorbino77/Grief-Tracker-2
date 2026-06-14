@@ -1,5 +1,19 @@
 {% load static %}<!doctype html>
-<html lang="en">
+<html lang="en"
+  {% if user.is_authenticated %}
+    {% if user.accessibility_prefs.high_contrast_mode %}data-a11y-high-contrast="true"{% endif %}
+    {% if user.accessibility_prefs.dyslexia_friendly_font %}data-a11y-dyslexia="true"{% endif %}
+    {% if user.accessibility_prefs.font_size != "normal" %}data-a11y-font-size="{{ user.accessibility_prefs.font_size }}"{% endif %}
+    {% if user.accessibility_prefs.colorblind_mode != "none" %}data-a11y-colorblind="{{ user.accessibility_prefs.colorblind_mode }}"{% endif %}
+    {% if user.accessibility_prefs.reduced_motion %}data-a11y-reduced-motion="true"{% endif %}
+    {% if user.accessibility_prefs.large_touch_targets %}data-a11y-large-targets="true"{% endif %}
+    {% if user.accessibility_prefs.keyboard_navigation_hints %}data-a11y-keyboard-hints="true"{% endif %}
+    {% if user.accessibility_prefs.simplified_layout %}data-a11y-simplified="true"{% endif %}
+    {% if user.accessibility_prefs.reading_guide %}data-a11y-reading-guide="true"{% endif %}
+    {% if user.accessibility_prefs.captions %}data-a11y-captions="true"{% endif %}
+    {% if user.accessibility_prefs.screen_reader_mode %}data-a11y-screen-reader="true"{% endif %}
+  {% endif %}
+>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,6 +22,8 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   {# Sync script: resolves stored theme + sets <html data-bs-theme> before paint. #}
   <script src="{% static 'js/theme.js' %}"></script>
+  {# Accessibility options (gaming-style) #}
+  <script src="{% static 'js/accessibility.js' %}" defer></script>
   {% block head_extra %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
@@ -19,6 +35,12 @@
     </a>
 
     <div class="d-flex align-items-center gap-2 order-md-3 ms-md-2">
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:accessibility' %}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Accessibility Settings (Alt+A)" aria-label="Accessibility Settings">
+          <span aria-hidden="true">♿</span>
+          <span class="d-none d-lg-inline">Access</span>
+        </a>
+      {% endif %}
       <div class="dropdown">
         <button id="themeToggleBtn"
                 class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1"

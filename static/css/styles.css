@@ -605,3 +605,215 @@ main > * {
   .card { border: none !important; box-shadow: none !important; }
   .table thead th { position: static !important; }
 }
+
+/* ========== 16. GAMING-STYLE ACCESSIBILITY OPTIONS ========== */
+
+/* 1. DYSLEXIA-FRIENDLY FONT */
+[data-a11y-dyslexia="true"] {
+  font-family: "OpenDyslexic", "Comic Sans MS", cursive, sans-serif !important;
+}
+
+/* 2. FONT SIZE SCALING */
+[data-a11y-font-size="large"] { font-size: 125% !important; }
+[data-a11y-font-size="xlarge"] { font-size: 150% !important; }
+[data-a11y-font-size="xxlarge"] { font-size: 175% !important; }
+
+/* Scale headings proportionally */
+[data-a11y-font-size="large"] h1, [data-a11y-font-size="large"] .h1 { font-size: 2.1875rem; }
+[data-a11y-font-size="large"] h2, [data-a11y-font-size="large"] .h2 { font-size: 1.5625rem; }
+[data-a11y-font-size="xlarge"] h1, [data-a11y-font-size="xlarge"] .h1 { font-size: 2.625rem; }
+[data-a11y-font-size="xlarge"] h2, [data-a11y-font-size="xlarge"] .h2 { font-size: 1.875rem; }
+[data-a11y-font-size="xxlarge"] h1, [data-a11y-font-size="xxlarge"] .h1 { font-size: 3.0625rem; }
+[data-a11y-font-size="xxlarge"] h2, [data-a11y-font-size="xxlarge"] .h2 { font-size: 2.1875rem; }
+
+/* 3. HIGH CONTRAST MODE */
+[data-a11y-high-contrast="true"] {
+  --bs-primary: #0000ff;
+  --bs-secondary-color: #000000;
+  --bs-body-color: #000000;
+  --bs-body-bg: #ffffff;
+  --bs-border-color: #000000;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+[data-a11y-high-contrast="true"] .card { border: 3px solid #000000 !important; }
+[data-a11y-high-contrast="true"] .btn { border-width: 2px; font-weight: 700; }
+[data-a11y-high-contrast="true"] a { color: #0000ff !important; text-decoration: underline !important; }
+[data-a11y-high-contrast="true"] .navbar { border-bottom: 3px solid #000000 !important; }
+[data-a11y-high-contrast="true"] table { border: 2px solid #000000 !important; }
+
+/* 4. COLORBLIND MODES */
+/* Protanopia (Red-Blind) - use blue/yellow/gray instead of red/green */
+[data-a11y-colorblind="protanopia"] .alert-danger,
+[data-a11y-colorblind="protanopia"] .text-danger,
+[data-a11y-colorblind="protanopia"] .btn-danger {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+  border-color: #ffecb5 !important;
+}
+
+[data-a11y-colorblind="protanopia"] .alert-success,
+[data-a11y-colorblind="protanopia"] .text-success,
+[data-a11y-colorblind="protanopia"] .btn-success {
+  background-color: #cfe2ff !important;
+  color: #084298 !important;
+  border-color: #b6d4fe !important;
+}
+
+/* Deuteranopia (Green-Blind) - use blue/orange/gray instead of red/green */
+[data-a11y-colorblind="deuteranopia"] .alert-danger,
+[data-a11y-colorblind="deuteranopia"] .text-danger {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+}
+
+[data-a11y-colorblind="deuteranopia"] .alert-success,
+[data-a11y-colorblind="deuteranopia"] .text-success {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+}
+
+/* Tritanopia (Blue-Yellow Blind) - use red/cyan/gray instead */
+[data-a11y-colorblind="tritanopia"] {
+  filter: url(#tritanopia-filter);
+}
+
+/* Achromatopsia (Complete Color Blindness) */
+[data-a11y-colorblind="achromatopsia"] {
+  filter: grayscale(100%) !important;
+}
+
+/* 5. REDUCED MOTION */
+[data-a11y-reduced-motion="true"],
+[data-a11y-reduced-motion="true"] * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* 6. LARGE TOUCH TARGETS */
+[data-a11y-large-targets="true"] .btn,
+[data-a11y-large-targets="true"] button {
+  padding: 0.75rem 1.5rem !important;
+  min-height: 48px;
+  min-width: 48px;
+  font-size: 1.05rem !important;
+}
+
+[data-a11y-large-targets="true"] .form-check-input {
+  width: 1.5em !important;
+  height: 1.5em !important;
+  margin-top: 0.4em !important;
+}
+
+[data-a11y-large-targets="true"] a {
+  padding: 0.25rem 0.5rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-a11y-large-targets="true"] .form-control,
+[data-a11y-large-targets="true"] .form-select {
+  min-height: 48px;
+  font-size: 1rem !important;
+  padding: 0.75rem !important;
+}
+
+[data-a11y-large-targets="true"] .nav-link {
+  padding: 0.75rem 1rem !important;
+}
+
+/* 7. KEYBOARD NAVIGATION HINTS */
+[data-a11y-keyboard-hints="true"] *:focus {
+  outline: 3px solid var(--bs-primary) !important;
+  outline-offset: 2px !important;
+}
+
+[data-a11y-keyboard-hints="true"] .btn:focus-visible {
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25) !important;
+}
+
+[data-a11y-keyboard-hints="true"] input:focus,
+[data-a11y-keyboard-hints="true"] textarea:focus,
+[data-a11y-keyboard-hints="true"] select:focus {
+  outline: 3px solid var(--bs-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* 8. SIMPLIFIED LAYOUT */
+[data-a11y-simplified="true"] .sidebar,
+[data-a11y-simplified="true"] .advanced-options,
+[data-a11y-simplified="true"] .secondary-nav {
+  display: none !important;
+}
+
+[data-a11y-simplified="true"] main {
+  max-width: 100% !important;
+}
+
+[data-a11y-simplified="true"] .card-body {
+  padding: 1.5rem !important;
+}
+
+/* 9. READING GUIDE */
+[data-a11y-reading-guide="true"] {
+  background: linear-gradient(
+    to bottom,
+    transparent calc(50% - 1em),
+    rgba(79, 70, 229, 0.15) calc(50% - 1em),
+    rgba(79, 70, 229, 0.15) calc(50% + 1em),
+    transparent calc(50% + 1em)
+  ) fixed;
+  background-size: 100% 100%;
+}
+
+/* 10. SCREEN READER MODE */
+[data-a11y-screen-reader="true"] .sr-only {
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: auto !important;
+}
+
+[data-a11y-screen-reader="true"] [aria-hidden="true"] {
+  display: none !important;
+}
+
+/* 11. CAPTIONS (for video content) */
+[data-a11y-captions="true"] video::cue {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* 12. FOCUS MANAGEMENT - Always visible focus indicators */
+:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+/* Better focus for form elements */
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+/* 13. SKIP LINKS (for keyboard navigation) */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--bs-primary);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-to-main:focus {
+  top: 0;
+}

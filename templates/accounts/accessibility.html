@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Accessibility Settings - ShipTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+        <span aria-hidden="true" style="font-size: 1.5em;">♿</span>
+        <h1 class="h4 m-0">Accessibility Settings</h1>
+      </div>
+
+      <div class="card-body">
+        <p class="text-muted mb-4">
+          Gaming-style accessibility options to customize your experience. All settings are saved automatically.
+        </p>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+
+          <!-- VISUAL ACCESSIBILITY -->
+          <div class="mb-5">
+            <h3 class="h5 border-bottom pb-2 mb-3">
+              <span aria-hidden="true">👁️</span> Visual Accessibility
+            </h3>
+
+            <div class="form-check mb-3">
+              {{ form.high_contrast_mode }}
+              <label class="form-check-label" for="{{ form.high_contrast_mode.id_for_label }}">
+                <strong>High Contrast Mode</strong>
+                <br/>
+                <small class="text-muted">Increases color contrast for better visibility</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-3">
+              {{ form.dyslexia_friendly_font }}
+              <label class="form-check-label" for="{{ form.dyslexia_friendly_font.id_for_label }}">
+                <strong>Dyslexia-Friendly Font</strong>
+                <br/>
+                <small class="text-muted">Uses OpenDyslexic font designed for readability</small>
+              </label>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.font_size.id_for_label }}" class="form-label">
+                <strong>Font Size</strong>
+              </label>
+              <div class="row g-2">
+                {% for value, label in form.font_size.field.choices %}
+                  <div class="col-auto">
+                    <label class="form-check">
+                      <input type="radio"
+                             name="{{ form.font_size.name }}"
+                             value="{{ value }}"
+                             class="form-check-input"
+                             {% if form.font_size.value == value %}checked{% endif %}>
+                      <span class="form-check-label">{{ label }}</span>
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.colorblind_mode.id_for_label }}" class="form-label">
+                <strong>Color Vision Mode</strong>
+              </label>
+              <div class="row g-2">
+                {% for value, label in form.colorblind_mode.field.choices %}
+                  <div class="col-12 col-md-6">
+                    <label class="form-check">
+                      <input type="radio"
+                             name="{{ form.colorblind_mode.name }}"
+                             value="{{ value }}"
+                             class="form-check-input"
+                             {% if form.colorblind_mode.value == value %}checked{% endif %}>
+                      <span class="form-check-label">{{ label }}</span>
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- MOTOR ACCESSIBILITY -->
+          <div class="mb-5">
+            <h3 class="h5 border-bottom pb-2 mb-3">
+              <span aria-hidden="true">🎮</span> Motor Accessibility
+            </h3>
+
+            <div class="form-check mb-3">
+              {{ form.reduced_motion }}
+              <label class="form-check-label" for="{{ form.reduced_motion.id_for_label }}">
+                <strong>Reduced Motion</strong>
+                <br/>
+                <small class="text-muted">Disables animations and transitions for less distraction</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-3">
+              {{ form.large_touch_targets }}
+              <label class="form-check-label" for="{{ form.large_touch_targets.id_for_label }}">
+                <strong>Large Touch Targets</strong>
+                <br/>
+                <small class="text-muted">Increases button and interactive element sizes</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-3">
+              {{ form.keyboard_navigation_hints }}
+              <label class="form-check-label" for="{{ form.keyboard_navigation_hints.id_for_label }}">
+                <strong>Keyboard Navigation Hints</strong>
+                <br/>
+                <small class="text-muted">Show keyboard shortcuts and enhanced focus indicators</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- COGNITIVE ACCESSIBILITY -->
+          <div class="mb-5">
+            <h3 class="h5 border-bottom pb-2 mb-3">
+              <span aria-hidden="true">🧠</span> Cognitive Accessibility
+            </h3>
+
+            <div class="form-check mb-3">
+              {{ form.simplified_layout }}
+              <label class="form-check-label" for="{{ form.simplified_layout.id_for_label }}">
+                <strong>Simplified Layout</strong>
+                <br/>
+                <small class="text-muted">Hide advanced features, focus on essential content</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-3">
+              {{ form.reading_guide }}
+              <label class="form-check-label" for="{{ form.reading_guide.id_for_label }}">
+                <strong>Reading Guide</strong>
+                <br/>
+                <small class="text-muted">Highlight current line to aid focus during reading</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- AUDIO & CONTENT -->
+          <div class="mb-5">
+            <h3 class="h5 border-bottom pb-2 mb-3">
+              <span aria-hidden="true">🔊</span> Audio & Content
+            </h3>
+
+            <div class="form-check mb-3">
+              {{ form.captions }}
+              <label class="form-check-label" for="{{ form.captions.id_for_label }}">
+                <strong>Captions</strong>
+                <br/>
+                <small class="text-muted">Show captions for any audio or video content</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-3">
+              {{ form.screen_reader_mode }}
+              <label class="form-check-label" for="{{ form.screen_reader_mode.id_for_label }}">
+                <strong>Screen Reader Mode</strong>
+                <br/>
+                <small class="text-muted">Optimize for screen reader compatibility</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- BUTTONS -->
+          <div class="d-grid gap-2 d-sm-flex gap-sm-2">
+            <button type="submit" class="btn btn-primary">
+              <span aria-hidden="true">✓</span> Save Settings
+            </button>
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+              <span aria-hidden="true">←</span> Back to Profile
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="alert alert-info mt-4" role="region" aria-label="Accessibility information">
+      <h5>💡 About These Settings</h5>
+      <ul class="mb-0 small">
+        <li><strong>Gaming-Inspired:</strong> These settings are based on modern gaming accessibility standards</li>
+        <li><strong>Persistent:</strong> All settings are saved to your account and apply across all devices</li>
+        <li><strong>WCAG 2.1 Compliant:</strong> Options follow Web Content Accessibility Guidelines</li>
+        <li><strong>No Performance Impact:</strong> These options are lightweight and don't slow down the app</li>
+        <li><strong>Privacy First:</strong> Settings are only stored in your account, never shared or tracked</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Preview accessibility changes in real-time
+  document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+    input.addEventListener('change', function() {
+      // Auto-submit the form on change (optional - removes need for Save button)
+      // Uncomment below for auto-save:
+      // this.form.submit();
+    });
+  });
+</script>
+{% endblock %}

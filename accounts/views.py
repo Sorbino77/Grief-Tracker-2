@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from .forms import UserCreateForm
-from .models import Role, User
+from .forms import AccessibilityPreferencesForm, UserCreateForm
+from .models import AccessibilityPreferences, Role, User
 from .permissions import role_required
 
 
@@ -58,3 +58,27 @@ def change_role(request, pk: int):
     target.save(update_fields=["role"])
     messages.success(request, f"Updated {target.username} to {new_role}.")
     return redirect("accounts:user_list")
+
+
+@login_required
+def accessibility_preferences(request):
+    """Manage accessibility settings (gaming-style accessibility options)."""
+    prefs, created = AccessibilityPreferences.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        form = AccessibilityPreferencesForm(request.POST, instance=prefs)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Accessibility settings updated!")
+            return redirect("accounts:accessibility")
+    else:
+        form = AccessibilityPreferencesForm(instance=prefs)
+
+    return render(
+        request,
+        "accounts/accessibility.html",
+        {
+            "form": form,
+            "prefs": prefs,
+        },
+    )
