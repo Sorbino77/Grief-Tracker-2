@@ -6,7 +6,8 @@
         clean clean-cache clean-pycache clean-all docker-up docker-down docker-logs \
         shell migrations show-migrations watch-tests security type-check format-check \
         install-dev install-prod collect-static reset-db fresh-db admin-user \
-        import-demo backup-db shell-db create-superuser
+        import-demo backup-db shell-db create-superuser accessibility a11y test-a11y \
+        makemigrations
 
 # ============================================================================
 # HELP & DOCUMENTATION
@@ -253,6 +254,47 @@ info:  ## ℹ️  Show project information
 	@echo "  http://localhost:8000/              # Main app"
 	@echo "  http://localhost:8000/admin/        # Django admin"
 	@echo "  http://localhost:8000/api/v1/       # REST API"
+	@echo ""
+
+# ============================================================================
+# ACCESSIBILITY (Gaming-Style Options)
+# ============================================================================
+
+accessibility:  ## ♿ Open accessibility settings page
+	@echo "Opening accessibility settings..."
+	@echo "Visit: http://localhost:8000/u/accessibility/"
+	@echo "Or press Alt+A in the app"
+
+a11y: accessibility  ## ♿ Alias for accessibility
+
+test-a11y:  ## ♿ Test accessibility features
+	@echo "Testing accessibility settings..."
+	@echo ""
+	@echo "1. Open http://localhost:8000/u/accessibility/"
+	@echo "2. Try each setting:"
+	@echo "   - High Contrast Mode (black/white)"
+	@echo "   - Dyslexia-Friendly Font (OpenDyslexic)"
+	@echo "   - Font Size (100-175%)"
+	@echo "   - Colorblind Modes (4 types)"
+	@echo "   - Reduced Motion (no animations)"
+	@echo "   - Large Touch Targets (48x48px)"
+	@echo "   - Keyboard Hints (focus indicators)"
+	@echo "   - Simplified Layout (hide advanced)"
+	@echo "   - Reading Guide (highlight line)"
+	@echo "   - Captions (video captions)"
+	@echo "   - Screen Reader Mode (assistive tech)"
+	@echo ""
+	@echo "3. Test keyboard shortcuts:"
+	@echo "   - Alt+A: Open accessibility settings"
+	@echo "   - Alt+?: Show keyboard shortcuts"
+	@echo "   - Tab/Shift+Tab: Navigate"
+	@echo "   - Enter: Activate buttons"
+	@echo "   - Space: Toggle checkboxes"
+	@echo ""
+	@echo "4. In browser console test:"
+	@echo "   - ShipTrackA11y.getPreferences()"
+	@echo "   - ShipTrackA11y.openSettings()"
+	@echo "   - ShipTrackA11y.showShortcuts()"
 	@echo ""
 
 .SILENT: info status
