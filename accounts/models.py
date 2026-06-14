@@ -111,14 +111,10 @@ class AccessibilityPreferences(models.Model):
     simplified_layout = models.BooleanField(
         default=False, help_text="Hide advanced features, focus on essential content"
     )
-    reading_guide = models.BooleanField(
-        default=False, help_text="Highlight current line with reading guide"
-    )
+    reading_guide = models.BooleanField(default=False, help_text="Highlight current line with reading guide")
 
     # Audio/Content
-    captions = models.BooleanField(
-        default=False, help_text="Show captions for audio content"
-    )
+    captions = models.BooleanField(default=False, help_text="Show captions for audio content")
     screen_reader_mode = models.BooleanField(
         default=False, help_text="Optimize for screen reader compatibility"
     )

@@ -50,7 +50,13 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(AccessibilityPreferences)
 class AccessibilityPreferencesAdmin(admin.ModelAdmin):
-    list_display = ("user", "high_contrast_mode", "dyslexia_friendly_font", "reduced_motion", "large_touch_targets")
+    list_display = (
+        "user",
+        "high_contrast_mode",
+        "dyslexia_friendly_font",
+        "reduced_motion",
+        "large_touch_targets",
+    )
     list_filter = (
         "high_contrast_mode",
         "dyslexia_friendly_font",

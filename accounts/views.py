@@ -63,7 +63,7 @@ def change_role(request, pk: int):
 @login_required
 def accessibility_preferences(request):
     """Manage accessibility settings (gaming-style accessibility options)."""
-    prefs, created = AccessibilityPreferences.objects.get_or_create(user=request.user)
+    prefs, _created = AccessibilityPreferences.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         form = AccessibilityPreferencesForm(request.POST, instance=prefs)
